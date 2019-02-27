@@ -2,8 +2,8 @@ package main
 
 import "io/ioutil"
 import "fmt"
-import "strings"
-
+//import "strings"
+/*
 func cut(path string) string {
 
    
@@ -14,6 +14,7 @@ func cut(path string) string {
 
     return path
 }
+*/
 func lister(path string){
         entries, err := ioutil.ReadDir(path)
 
@@ -29,8 +30,13 @@ func lister(path string){
     fmt.Println(entry.ModTime()) // Date de dernière modification
     fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
     fmt.Println(i)
+    if(entry.IsDir()){
+        lister(path+entry.Name()+"/")
+    }
+
 }
 }
+/*
 func lister_arbo(path string){
 
     //path := "/home/user/Bureau/app/"
@@ -39,10 +45,12 @@ func lister_arbo(path string){
     fmt.Println(strings.HasSuffix(path, "user"))
     for(strings.HasSuffix(path, "user")!=true){
     lister(path)
+
     path=cut(path)
     }
     fmt.Println(path)
 }
+*/
 func main() {
 
     /*
@@ -61,7 +69,9 @@ func main() {
     fmt.Println(path)
     */
     path := "/home/user/Bureau/app/"
-    lister_arbo(path)
+  
+    lister(path)
+    //lister_arbo(path)
 
 
 }
