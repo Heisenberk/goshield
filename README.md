@@ -1,1 +1,1 @@
-https://github.com/Heisenberk/GoShield
+https://heisenberk.github.io/GoShield/
