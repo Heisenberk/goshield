@@ -144,12 +144,15 @@ func ecrire_encryption(path string,name string,isdir bool,Mode os.FileMode){
     fmt.Println(path+name)
 
     }else if(Mode!=493 || Mode!=420){
-    	fmt.Print("ce fichier")
-    	fmt.Print(name)
-    	fmt.Println(" ne possède pas les droits en lectures/écritures")
+
+        fmt.Print("ce fichier ")
+        fmt.Print(name)
+        fmt.Println(" ne possède pas les droits en lectures/écritures")
     	}	
+        fmt.Println()
 }
 func ecrire_encryption_file(name string,Mode os.FileMode){
+
     fmt.Println(int(Mode),name)
 
       if((Mode==493 || Mode==420) ){
@@ -166,9 +169,11 @@ func ecrire_encryption_file(name string,Mode os.FileMode){
     fmt.Println(name)
 
     }else if(Mode!=493 || Mode!=420){
+        fmt.Println()
     	fmt.Print("ce fichier ")
     	fmt.Print(name)
     	fmt.Println(" ne possède pas les droits en lectures/écritures")
+        fmt.Println()
     	}	
 }	
 
@@ -183,7 +188,9 @@ func lister(path string){
     mode := fi.Mode();
     //fmt.Println(mode.IsRegular())
     if(mode.IsDir()==true){
-    	
+    	if(strings.LastIndexAny(path, "/") != len(path) - 1){
+        path=path+ string(os.PathSeparator)
+    }
     
    entries, err := ioutil.ReadDir(path)
          //path=strings.TrimRight(path,"/")
@@ -194,14 +201,6 @@ func lister(path string){
     }
     for _, entry := range entries {
 
-        /*
-    fmt.Println(entry.Name())    // Nom du fichier ("myphoto.jpg")
-    fmt.Println(entry.Size())    // Taille en octet (/1024 = Ko)
-    fmt.Println(entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
-    fmt.Println(entry.ModTime()) // Date de dernière modification
-    fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
-    */
-    //fmt.Println(i)
  
    ecrire_encryption(path,entry.Name(),entry.IsDir(),entry.Mode()) 
 chemin(path,entry.Name(),entry.IsDir())
@@ -214,6 +213,8 @@ chemin(path,entry.Name(),entry.IsDir())
 
     }
 
+
+
        
 }
 func lister_dech(path string){
@@ -225,18 +226,10 @@ func lister_dech(path string){
         fmt.Println(err)
     }
     for _, entry := range entries {
-        /*
-    fmt.Println(entry.Name())    // Nom du fichier ("myphoto.jpg")
-    fmt.Println(entry.Size())    // Taille en octet (/1024 = Ko)
-    fmt.Println(entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
-    fmt.Println(entry.ModTime()) // Date de dernière modification
-    fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
-    */
-    //fmt.Println(i)
-    //fmt.Println(path+entry.Name())
 
         ecrire_dech(path,entry.Name(),entry.IsDir(),entry.Mode())
     chemin(path,entry.Name(),entry.IsDir())
+   
 }
 
 
@@ -246,15 +239,9 @@ func give_me_the_name_of(path string){
 	        entries,_ := ioutil.ReadDir(path)
     for _, entry := range entries {
        
-    //fmt.Println(entry.Name())    // Nom du fichier ("myphoto.jpg")
-    //fmt.Println(entry.Size())    // Taille en octet (/1024 = Ko)
-    fmt.Printf("%d \n",entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
-    //fmt.Println(entry.ModTime()) // Date de dernière modification
-    //fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
-   
-    //fmt.Println(i)
-    //fmt.Println(path+entry.Name())
 
+    fmt.Printf("%d \n",entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
+ 
 
     
     
@@ -273,7 +260,9 @@ func give_me_the_name_of(path string){
 func main() {
 
 
-    path := "/home/user/Bureau/R/.project"
+    path := "/home/user/Bureau/R"
+
+    fmt.Println(len(path))
     
 
     //give_me_the_name_of(path)
