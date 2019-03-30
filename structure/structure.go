@@ -15,6 +15,12 @@ type Documents struct {
 	// Password représente le mot de passe choisi par l'utilisateur. 
 	Password string
 
+	// Sel qui sera concaténé au mot de passe pour faire le hash. 
+	Salt []byte
+
+	// SHA256(Salt|Password). 
+	Hash []byte
+
 	// Doc représente l'ensemble des chemins des fichiers/dossiers à (dé)chiffrer.
 	Doc []string
 }
