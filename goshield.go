@@ -3,9 +3,23 @@ package main
 
 import "os"
 import "fmt"
-
+//import "errors"
 import "github.com/Heisenberk/goshield/command"
 import "github.com/Heisenberk/goshield/structure"
+
+func Interpret( d  *structure.Documents ,err error ) {
+	if (err==nil){
+		
+	}else if(err.Error()=="Aucun argument. "){
+	fmt.Println("Commande de l'application")
+	fmt.Println("-e/-d")
+	fmt.Println("--encrypt : permet de choisir de chiffrer ")
+	fmt.Println("--decrypt : permet de choisir de  déchiffrer")
+	fmt.Println("-p[password] : permet de taper le mot de passe " )
+	fmt.Println("[Liste des fichiers/ dossiers : on liste les fichiers que l'on va chiffrer déchiffrer]")
+
+}
+}
 
 // main représente la fonction principale de GoShield.
 func main() {
@@ -13,4 +27,6 @@ func main() {
 	d, err := command.Parse(os.Args[1:])
 	fmt.Println(d)
 	fmt.Println(err)
+	Interpret(d,err)
+
 }
