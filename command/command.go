@@ -14,7 +14,7 @@ func Parse(arg []string) (*structure.Documents, error) {
 
 	// si l'utilisateur choisit des paramètres en ligne de commande.
 	}else {
-		// -c/-d -p password [file1].
+		// -e/-d -p password [file1].
 		if len(arg)>=4 {
 			var d structure.Documents
 

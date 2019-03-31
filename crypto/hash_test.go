@@ -22,11 +22,11 @@ func TestCreateHash(t *testing.T) {
 	doc := structure.Documents{Mode: structure.ENCRYPT, Password: "password", Salt: salt}
 
     if doc.Mode != structure.ENCRYPT {
-       t.Errorf("Assertion 1 TestSansArgument de hash_test FAILED.")
+       t.Errorf("Assertion 1 TestCreateHash de hash_test FAILED.")
     }
 
     if testEgaliteSlice(salt, doc.Salt) == false {
-    	t.Errorf("Assertion 2 TestSansArgument de hash_test FAILED.")
+    	t.Errorf("Assertion 2 TestCreateHash de hash_test FAILED.")
     }
 
     hash := sha256.New()
@@ -37,7 +37,7 @@ func TestCreateHash(t *testing.T) {
     test := []byte{185, 200, 122, 186, 38, 7, 228, 168, 206, 176, 175, 82, 249, 83, 99, 235, 150, 140, 146, 208, 201, 49, 30, 157, 144, 0, 163, 88, 191, 153, 103, 9}
 
     if testEgaliteSlice(test, doc.Hash) == false {
-    	t.Errorf("Assertion 3 TestSansArgument de hash_test FAILED.")
+    	t.Errorf("Assertion 3 TestCreateHash de hash_test FAILED.")
     }
 
 }
