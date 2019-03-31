@@ -13,7 +13,9 @@ import (
     "os"
     "crypto/sha1"
     //"syscall"
+
 )
+
 
 
 
@@ -121,11 +123,15 @@ func getname_file(path string) string {
     check(err1)
     fmt.Println(path+name)
 
-    }else if(Mode!=493 || Mode!=420){
+    }else if(Mode!=493){
+            if (Mode!=420 ){
+            
+        
         fmt.Print("ce fichier")
         fmt.Print(name)
         fmt.Println("ne possède pas les droits en lectures /écritures")
         }
+    }
 }
 func ecrire_encryption(path string,name string,isdir bool,Mode os.FileMode){
     fmt.Println(int(Mode),name)
@@ -143,13 +149,15 @@ func ecrire_encryption(path string,name string,isdir bool,Mode os.FileMode){
     check(err1)
     fmt.Println(path+name)
 
-    }else if(Mode!=493 || Mode!=420){
-
-        fmt.Print("ce fichier ")
+    }else if(Mode!=493){
+            if (Mode!=420 ){
+            
+        
+        fmt.Print("ce fichier")
         fmt.Print(name)
-        fmt.Println(" ne possède pas les droits en lectures/écritures")
-    	}	
-        fmt.Println()
+        fmt.Println("ne possède pas les droits en lectures /écritures")
+        }
+    }
 }
 func ecrire_encryption_file(name string,Mode os.FileMode){
 
@@ -168,13 +176,15 @@ func ecrire_encryption_file(name string,Mode os.FileMode){
     check(err1)
     fmt.Println(name)
 
-    }else if(Mode!=493 || Mode!=420){
-        fmt.Println()
-    	fmt.Print("ce fichier ")
-    	fmt.Print(name)
-    	fmt.Println(" ne possède pas les droits en lectures/écritures")
-        fmt.Println()
-    	}	
+    }else if(Mode!=493){
+            if (Mode!=420 ){
+            
+        
+        fmt.Print("ce fichier")
+        fmt.Print(name)
+        fmt.Println("ne possède pas les droits en lectures /écritures")
+        }
+    }
 }	
 
 func lister(path string){
@@ -260,14 +270,18 @@ func give_me_the_name_of(path string){
 func main() {
 
 
-    path := "/home/user/Bureau/R"
+    path := "/home/user/Bureau/R/"
 
-    fmt.Println(len(path))
+    
     
 
     //give_me_the_name_of(path)
     //lister_dech(path)
     lister(path)
+    
+
+    
+
 
 
 
