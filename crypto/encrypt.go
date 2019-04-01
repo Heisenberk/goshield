@@ -6,6 +6,7 @@ import "crypto/aes"
 import "crypto/cipher"
 import "os"
 import "fmt"
+import "errors"
 
 import "github.com/Heisenberk/goshield/structure"
 
@@ -27,39 +28,41 @@ func Xor(a []byte, b []byte) []byte {
 	return c
 }
 
-func EncryptBlocAES(iv []byte, key []byte, input []byte) []byte {
+func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
+
+	// Résultat du chiffrement sera dans output.
+	output := make([]byte, aes.BlockSize)
 
 	// Si la taille de l'entrée est invalide on lance une erreur. 
 	if len(input)%aes.BlockSize != 0 {
-		panic("EXCEPTION A LANCER") 
+		return output, errors.New("Failure Encryption : Taille du bloc invalide.")
 	}
 
 	// Preparation du bloc qui sera chiffré. 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return output, errors.New("Failure Encryption : Erreur lors du chiffrement d'un bloc.")
 	}
-
-	// Résultat du chiffrement sera dans output.
-	output := make([]byte, aes.BlockSize)
 
 	// Chiffrement AES avec le mode opératoire CBC.
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(output[:aes.BlockSize], input)
 
-	return output
+	return output, nil
 }
 
-func EncryptFileAES(pathFile string, doc *structure.Documents){
+func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	// ouverture du fichier a chiffrer
-	file, err := os.Open(pathFile) 
-	if err != nil {
-		panic("EXCEPTION A LANCER1") 
+	inputFile, err1 := os.Open(pathFile) 
+	if err1 != nil {
+		var texteError string = "Failure Encryption : Impossible d'ouvrir le fichier à chiffrer "+pathFile+". "
+		return errors.New(texteError)
 	}
 
-	stat, err := file.Stat()
-	if err != nil {
-  		panic("EXCEPTION A LANCER2") 
+	stat, err2 := inputFile.Stat()
+	if err2 != nil {
+  		var texteError string = "Failure Encryption : Impossible de lire le fichier à chiffrer "+pathFile+". "
+		return errors.New(texteError)
 	}
 
 	fmt.Printf("The file is %d bytes long", stat.Size())
@@ -69,32 +72,36 @@ func EncryptFileAES(pathFile string, doc *structure.Documents){
 	if (int)(stat.Size())%aes.BlockSize != 0 {
 		iterations=iterations+1
 	}
-	fmt.Printf(">%d\n",iterations)
+	fmt.Printf("\nnb iterations : %d\n",iterations)
 
 	// ouverture du fichier résultat
-    f, err := os.Create(pathFile+".gsh")
-    if err != nil {
-  		panic("EXCEPTION A LANCER3") 
+    outputFile, err3 := os.Create(pathFile+".gsh")
+    if err3 != nil {
+  		var texteError string = "Failure Encryption : Impossible d'écrire le fichier chiffré "+pathFile+".gsh. "
+		return errors.New(texteError)
 	}
 
 	// ecriture de la signature
-	_, err5 := f.WriteString("GOSHIELD")
-    if err5 != nil {
-  		panic("EXCEPTION A LANCER4") 
+	_, err4 := outputFile.WriteString("GOSHIELD")
+    if err4 != nil {
+  		var texteError string = "Failure Encryption : Impossible d'écrire dans le fichier chiffré "+pathFile+".gsh. "
+		return errors.New(texteError) 
 	}
 
 	// ecriture du salt 
 	CreateHash(doc)
-	_, err0 := f.Write(doc.Salt)
-	if err0 != nil {
-  		panic("EXCEPTION A LANCER44") 
+	_, err5 := outputFile.Write(doc.Salt)
+	if err5 != nil {
+  		var texteError string = "Failure Encryption : Impossible de générer le salt. "
+		return errors.New(texteError)
 	}
 
 	// ecriture de la valeur d'initialisation IV
 	IV := CreateIV()
-	_, err6 := f.Write(IV)
+	_, err6 := outputFile.Write(IV)
     if err6 != nil {
-  		panic("EXCEPTION A LANCER5") 
+  		var texteError string = "Failure Encryption : Impossible d'écrire la valeur d'initialisation IV. "
+		return errors.New(texteError) 
 	}
 
 	// ecriture de la taille du dernier bloc (sans padding) en octets
@@ -104,14 +111,14 @@ func EncryptFileAES(pathFile string, doc *structure.Documents){
 	}else {
 		length=(int)(stat.Size())%aes.BlockSize
 	}
-	fmt.Printf(">>%d\n", length)
-	_, err7 := f.WriteString(fmt.Sprintf("%d", length))
+	fmt.Printf("Taille du dernier bloc chiffré : %d\n", length)
+	_, err7 := outputFile.WriteString(fmt.Sprintf("%d", length))
 	if err7 != nil {
-  		panic("EXCEPTION A LANCER6") 
+  		var texteError string = "Failure Encryption : Impossible d'écrire la taille du dernier bloc chiffré. "
+		return errors.New(texteError)
 	}
 
 	// chiffrement de chaque bloc de données et ecriture des donnees chiffrees
-	//d2 := []byte{115, 111, 109, 101, 10}
 	input := make([]byte, 16)
 	var seek int64 = 0
 	var cipherBlock []byte
@@ -119,9 +126,10 @@ func EncryptFileAES(pathFile string, doc *structure.Documents){
 		input =[]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 		// lecture de chaque bloc de 16 octets
-		_, err8 := file.Read(input)
+		_, err8 := inputFile.Read(input)
 		if err8 != nil {
-  			panic("EXCEPTION A LANCER7") 
+  			var texteError string = "Failure Encryption : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
+			return errors.New(texteError)
 		}
     	fmt.Println(input)
 
@@ -131,19 +139,28 @@ func EncryptFileAES(pathFile string, doc *structure.Documents){
     	}
 
     	seek = aes.BlockSize*((int64)(i+1))
-   		_, err9 := f.Seek(seek, 0)
+   		_, err9 := outputFile.Seek(seek, 0)
    		if err9 != nil {
-  			panic("EXCEPTION A LANCER8") 
+  			var texteError string = "Failure Encryption : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
+			return errors.New(texteError)
 		}
 
 		// chiffrement de chaque bloc et écriture
-		cipherBlock = EncryptBlocAES(IV, doc.Hash, input)
-		_, err10 := f.Write(cipherBlock)
+		var err10 error
+		cipherBlock, err10 = EncryptBlocAES(IV, doc.Hash, input)
 		if err10 != nil {
-  			panic("EXCEPTION A LANCER9") 
+			var texteError string = "Failure Encryption : Impossible de chiffrer le fichier "+pathFile+". "
+			return errors.New(texteError)
+		}
+		_, err11 := outputFile.Write(cipherBlock)
+		if err11 != nil {
+  			var texteError string = "Failure Encryption : Impossible d'écrire dans le fichier "+pathFile+".gsh. "
+			return errors.New(texteError)
 		}
 	}
-	
-    f.Close()
+
+    outputFile.Close()
+    inputFile.Close()
+    return nil
 
 }

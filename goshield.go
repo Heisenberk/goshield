@@ -29,7 +29,10 @@ func Interpret( d  *structure.Documents ,err error ) {
 func main() {
 	var d structure.Documents
 	d.Password = "password"
-	crypto.EncryptFileAES("test5.txt", &d)
+	err := crypto.EncryptFileAES("test5.txt", &d)
+	if err != nil {
+		fmt.Println(err)
+	}
 	/*var d *structure.Documents
 	d, err := command.Parse(os.Args[1:])
 	fmt.Println(d)
