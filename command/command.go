@@ -4,6 +4,7 @@ package command
 import "fmt"
 import "errors"
 import "github.com/Heisenberk/goshield/structure"
+import "github.com/Heisenberk/goshield/App"
 
 // Parse représente la fonction qui interpréte les commandes de l'utilisateur. 
 func Parse(arg []string) (*structure.Documents, error) {
@@ -53,4 +54,22 @@ func Parse(arg []string) (*structure.Documents, error) {
 
 		return nil, errors.New("Commande non reconnue. ")
 	}
+}
+func Interpret( d  *structure.Documents ,err error ) {
+
+	if (err==nil){
+		if(d.Mode == 1){
+			App.Lister(d.Doc[0])
+		}
+
+		
+	}else if(err.Error()=="Aucun argument. "){
+	fmt.Println("Commande de l'application")
+	fmt.Println("-e/-d")
+	fmt.Println("--encrypt : permet de choisir de chiffrer ")
+	fmt.Println("--decrypt : permet de choisir de  déchiffrer")
+	fmt.Println("-p[password] : permet de taper le mot de passe " )
+	fmt.Println("[Liste des fichiers/ dossiers : on liste les fichiers que l'on va chiffrer déchiffrer]")
+
+}
 }
