@@ -65,14 +65,14 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		return errors.New(texteError)
 	}
 
-	fmt.Printf("The file is %d bytes long", stat.Size())
+	//fmt.Printf("The file is %d bytes long", stat.Size())
 
 	var division int = (int)(stat.Size()/aes.BlockSize)
 	var iterations int = division
 	if (int)(stat.Size())%aes.BlockSize != 0 {
 		iterations=iterations+1
 	}
-	fmt.Printf("\nnb iterations : %d\n",iterations)
+	//fmt.Printf("\nnb iterations : %d\n",iterations)
 
 	// ouverture du fichier résultat
     outputFile, err3 := os.Create(pathFile+".gsh")
@@ -111,7 +111,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	}else {
 		length=(int)(stat.Size())%aes.BlockSize
 	}
-	fmt.Printf("Taille du dernier bloc chiffré : %d\n", length)
+	//fmt.Printf("Taille du dernier bloc chiffré : %d\n", length)
 	_, err7 := outputFile.WriteString(fmt.Sprintf("%d", length))
 	if err7 != nil {
   		var texteError string = "Failure Encryption : Impossible d'écrire la taille du dernier bloc chiffré. "
@@ -131,7 +131,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
   			var texteError string = "Failure Encryption : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
 			return errors.New(texteError)
 		}
-    	fmt.Println(input)
+    	//fmt.Println(input)
 
     	// si on est au tour i (i!=0), IV vaut le chiffré du tour i-1
     	if i != 0 {

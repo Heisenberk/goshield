@@ -29,5 +29,5 @@ func main() {
 
 	fmt.Println(err)
 	//fmt.Println(err)
-	//command.Interpret(d,err)
+	command.Interpret(d,err)
 }
