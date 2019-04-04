@@ -5,8 +5,8 @@ import "time"
 import "crypto/aes"
 import "crypto/cipher"
 import "os"
-import "fmt"
 import "errors"
+import "fmt"
 
 import "github.com/Heisenberk/goshield/structure"
 
@@ -16,17 +16,6 @@ func CreateIV() []byte {
 	rand.Read(iv)
 	return iv
 }
-
-/*func Xor(a []byte, b []byte) []byte {
-	if len(a)!= len(b){
-		return nil
-	}
-	c := make([]byte, len(a))
-	for i:=0 ; i< len(a) ;i++ {
-		c[i]=a[i]^b[i]
-	}
-	return c
-}*/
 
 func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 
@@ -52,21 +41,19 @@ func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 }
 
 func EncryptFileAES(pathFile string, doc *structure.Documents) error{
+
 	// ouverture du fichier a chiffrer
 	inputFile, err1 := os.Open(pathFile) 
 	if err1 != nil {
 		var texteError string = "Failure Encryption : Impossible d'ouvrir le fichier à chiffrer "+pathFile+". "
 		return errors.New(texteError)
 	}
-
 	stat, err2 := inputFile.Stat()
 	if err2 != nil {
   		var texteError string = "Failure Encryption : Impossible d'interpréter le fichier à chiffrer "+pathFile+". "
 		return errors.New(texteError)
 	}
 
-
-	fmt.Printf("The file is %d bytes long", stat.Size())
 	// vérification de la bonne permission
 	if stat.Mode().String()[1]=='-' {
 		var texteError string = "Failure Encryption : Permission du fichier à chiffrer "+pathFile+" incorrecte . "
@@ -79,7 +66,6 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	if (int)(stat.Size())%aes.BlockSize != 0 {
 		iterations=iterations+1
 	}
-	//fmt.Printf("\nnb iterations : %d\n",iterations)
 
 	// ouverture du fichier résultat
     outputFile, err3 := os.Create(pathFile+".gsh")
@@ -97,11 +83,6 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 
 	// ecriture du salt 
 	CreateHash(doc)
-	fmt.Printf("Salt : ")
-	fmt.Println(doc.Salt)
-
-	fmt.Printf("Hash: ")
-	fmt.Println(doc.Hash)
 	_, err5 := outputFile.Write(doc.Salt)
 	if err5 != nil {
   		var texteError string = "Failure Encryption : Impossible de générer le salt. "
@@ -110,8 +91,6 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 
 	// ecriture de la valeur d'initialisation IV
 	IV := CreateIV()
-	fmt.Printf("IV: ")
-	fmt.Println(IV)
 	_, err6 := outputFile.Write(IV)
     if err6 != nil {
   		var texteError string = "Failure Encryption : Impossible d'écrire la valeur d'initialisation IV. "
@@ -125,11 +104,8 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	}else {
 		length=(int)(stat.Size())%aes.BlockSize
 	}
-
-	fmt.Printf("Taille du dernier bloc chiffré : %d\n", length)
 	lengthWritten := make([]byte, 1)
 	lengthWritten[0]=byte(length)
-	//_, err7 := outputFile.WriteString(fmt.Sprintf("%d", length))
 	_, err7 := outputFile.Write(lengthWritten)
 	if err7 != nil {
   		var texteError string = "Failure Encryption : Impossible d'écrire la taille du dernier bloc chiffré. "
@@ -138,9 +114,10 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 
 	// chiffrement de chaque bloc de données et ecriture des donnees chiffrees
 	input := make([]byte, 16)
-	//var seek int64 = 0
 	var cipherBlock []byte
+
 	for i:= 0; i<iterations; i++{
+
 		input =[]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 		// lecture de chaque bloc de 16 octets
@@ -150,46 +127,32 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 			return errors.New(texteError)
 		}
 
-
     	// si on est au tour i (i!=0), IV vaut le chiffré du tour i-1
     	if i != 0 {
     		IV = cipherBlock
     	}
 
-    	fmt.Printf("\n");
-    	fmt.Printf("input=")
-    	fmt.Println(input)
-    	fmt.Printf("IV=")
-    	fmt.Println(IV)
-    	fmt.Printf("KEY=")
-    	fmt.Println(doc.Hash)
-
-    	/*seek = aes.BlockSize*((int64)(i+1))
-   		_, err9 := outputFile.Seek(seek, 0)
-   		if err9 != nil {
-  			var texteError string = "Failure Encryption : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
-			return errors.New(texteError)
-		}*/
-
-		// chiffrement de chaque bloc et écriture
+		// chiffrement de chaque bloc 
 		var err10 error
 		cipherBlock, err10 = EncryptBlocAES(IV, doc.Hash, input)
 		if err10 != nil {
 			var texteError string = "Failure Encryption : Impossible de chiffrer le fichier "+pathFile+". "
 			return errors.New(texteError)
 		}
+
+		// écriture du bloc chiffré
 		_, err11 := outputFile.Write(cipherBlock)
 		if err11 != nil {
   			var texteError string = "Failure Encryption : Impossible d'écrire dans le fichier "+pathFile+".gsh. "
 			return errors.New(texteError)
 		}
-
-		fmt.Printf("output=")
-    	fmt.Println(cipherBlock)
 	}
 
     outputFile.Close()
     inputFile.Close()
+
+    var messageSuccess string = "- Success Encryption : "+pathFile+" : resultat dans le fichier "+pathFile+".gsh"
+    fmt.Println(messageSuccess)
     return nil
 
 }

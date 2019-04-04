@@ -9,12 +9,6 @@ import "fmt"
 import "github.com/Heisenberk/goshield/structure"
 
 func DecryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error){
-	
-fmt.Printf("\n");
-    	fmt.Printf("input=")
-    	fmt.Println(input)
-    	fmt.Printf("IV changé tt seul=")
-    	fmt.Println(iv)
 
 	// Résultat du chiffrement sera dans output.
 	output := make([]byte, aes.BlockSize)
@@ -33,13 +27,6 @@ fmt.Printf("\n");
 	// Chiffrement AES avec le mode opératoire CBC.
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(input, input)
-
-	
-    	
-    	fmt.Printf("KEY=")
-    	fmt.Println(key)
-    	fmt.Printf("output=")
-    	fmt.Println(input)
 
 	return input, nil
 }
@@ -66,22 +53,16 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 		var texteError string = "Failure Decryption : Format du fichier à déchiffrer "+pathFile+" invalide. "
 		return errors.New(texteError)
 	}
-    fmt.Printf(": %s\n", string(signature))
 
-    // lecture du salt
+    // lecture du salt et déduction de la clé
     salt := make([]byte, 15)
     _, err22 := inputFile.Read(salt)
     if err22 != nil {
 		var texteError string = "Failure Decryption : Impossible de lire le salt du fichier chiffré "+pathFile+". "
 		return errors.New(texteError)
 	}
-	fmt.Printf("Salt : ")
 	doc.Salt=salt
-	fmt.Println(salt)
-
 	DeductHash(doc)
-	fmt.Printf("Hash: ")
-	fmt.Println(doc.Hash)
 
 	// lecture de la valeur IV
 	IV := make([]byte, 16)
@@ -90,8 +71,6 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 		var texteError string = "Failure Decryption : Impossible de lire la valeur d'initialisation du fichier chiffré "+pathFile+". "
 		return errors.New(texteError)
 	}
-	fmt.Printf("IV: ")
-	fmt.Println(IV)
 
 	// lecture de la taille du dernier bloc
 	lengthTab := make([]byte, 1)
@@ -101,16 +80,11 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 		return errors.New(texteError)
 	}
 
-	fmt.Printf("Taille du dernier bloc chiffré : ")
-	fmt.Println(lengthTab[0])
-
 	stat, err2 := inputFile.Stat()
 	if err2 != nil {
   		var texteError string = "Failure Decryption : Impossible d'interpréter le fichier à déchiffrer "+pathFile+". "
 		return errors.New(texteError)
 	}
-
-	fmt.Printf("The file is %d bytes long\n", stat.Size())
 
 	// on soustrait la taille de la signature (8) + le salt (15) + IV (16) + taille du dernier bloc (1)
 	var division int = (int)((stat.Size()-8-15-16-1)/aes.BlockSize) 
@@ -119,7 +93,6 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 		var texteError string = "Failure Decryption : Fichier" + pathFile +" non conforme pour le déchiffrement AES. "
 		return errors.New(texteError)
 	}
-	fmt.Printf("Nb iterations : %d\n",iterations)
 
     // ouverture du fichier résultat
     var nameOutput string=pathFile[:(len(pathFile)-4)]
@@ -133,16 +106,10 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 	var cipherBlock []byte
 	temp := make([]byte, 16)
 	for i:=0 ; i<iterations ; i++ {
-		fmt.Println("-------------------------------------------------")
-
-		fmt.Printf("IV a choisir=")
-    	fmt.Println(temp)
 
     	// si on est au tour i (i!=0), IV vaut le chiffré du tour i-1
     	if (i) != 0 {
     		IV = temp
-    		fmt.Printf("IV choisi=")
-    		fmt.Println(IV)
     	}
 
 		input =[]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -154,17 +121,8 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 			return errors.New(texteError)
 		}
 
-		fmt.Printf("IV choisi2=")
-    		fmt.Println(IV)
-
     	temp =[]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		copy(temp, input)
-    	
-
-
-    	
-fmt.Printf("IV choisi3=")
-    		fmt.Println(IV)
 		
 		// déchiffrement de chaque bloc et écriture
 		var err10 error
@@ -174,14 +132,13 @@ fmt.Printf("IV choisi3=")
 			return errors.New(texteError)
 		}
 		
-
+		// dans le dernier bloc, il faut enlever les bits de padding qui ne sont pas dans le message initial.
 		if i==(iterations-1) {
 			_, err11 := outputFile.Write(cipherBlock[:lengthTab[0]])
 			if err11 != nil {
   				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
 				return errors.New(texteError)
 			}
-
 		}else {
 			_, err11 := outputFile.Write(cipherBlock)
 			if err11 != nil {
@@ -189,23 +146,13 @@ fmt.Printf("IV choisi3=")
 				return errors.New(texteError)
 			}
 		}
-
-			/*_, err13 := outputFile.Write(cipherBlock)
-			if err13 != nil {
-  				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
-				return errors.New(texteError)
-			}*/
-		
-
-		
-    	
-		
-    	
 	}
-
 
 	inputFile.Close()
 	outputFile.Close()
+
+	var messageSuccess string = "- Success Decryption "+pathFile+" : resultat dans le fichier "+nameOutput
+    fmt.Println(messageSuccess)
 
 	return nil
 }
