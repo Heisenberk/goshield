@@ -17,7 +17,7 @@ func CreateIV() []byte {
 	return iv
 }
 
-func Xor(a []byte, b []byte) []byte {
+/*func Xor(a []byte, b []byte) []byte {
 	if len(a)!= len(b){
 		return nil
 	}
@@ -26,7 +26,7 @@ func Xor(a []byte, b []byte) []byte {
 		c[i]=a[i]^b[i]
 	}
 	return c
-}
+}*/
 
 func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 

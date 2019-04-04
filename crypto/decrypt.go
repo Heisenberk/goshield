@@ -173,17 +173,28 @@ fmt.Printf("IV choisi3=")
 			var texteError string = "Failure Decryption : Impossible de déchiffrer le fichier "+pathFile+". "
 			return errors.New(texteError)
 		}
-		_, err11 := outputFile.Write(cipherBlock)
-		if err11 != nil {
-  			var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
-			return errors.New(texteError)
-		}
+		
 
-			_, err13 := outputFile.Write(cipherBlock)
-			if err13 != nil {
+		if i==(iterations-1) {
+			_, err11 := outputFile.Write(cipherBlock[:lengthTab[0]])
+			if err11 != nil {
   				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
 				return errors.New(texteError)
 			}
+
+		}else {
+			_, err11 := outputFile.Write(cipherBlock)
+			if err11 != nil {
+  				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
+				return errors.New(texteError)
+			}
+		}
+
+			/*_, err13 := outputFile.Write(cipherBlock)
+			if err13 != nil {
+  				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
+				return errors.New(texteError)
+			}*/
 		
 
 		

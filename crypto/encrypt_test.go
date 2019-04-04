@@ -6,7 +6,7 @@ import "encoding/hex"
 //import "fmt"
 
 
-func TestXor(t *testing.T) {
+/*func TestXor(t *testing.T) {
 	a := []byte{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 	b := []byte{254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254}
 	c := Xor (a, b)
@@ -16,7 +16,7 @@ func TestXor(t *testing.T) {
     	t.Errorf("Assertion TestXor de encrypt_test FAILED.")
     }
 
-}
+}*/
 
 func TestEncryptBlocAES(t *testing.T){
 	// IV sur 16 octets (128 bits).
@@ -28,11 +28,14 @@ func TestEncryptBlocAES(t *testing.T){
 	// Input sur 16 octets (128 bits).
 	input := []byte{84, 69, 83, 84, 84, 69, 83, 84, 84, 69, 83, 84, 84, 69, 83, 84} 
 
-	output := EncryptBlocAES(iv, key, input)
+	output, err := EncryptBlocAES(iv, key, input)
+	if err != nil {
+    	t.Errorf("Assertion 1TestEncryptBlocAES de encrypt_test FAILED.")
+    }
 
 	test := []byte{126, 119, 20, 94, 251, 169, 63, 50, 62, 9, 220, 143, 72, 168, 19, 24}
 	if testEgaliteSlice(test, output) == false {
-    	t.Errorf("Assertion TestEncryptBlocAES de encrypt_test FAILED.")
+    	t.Errorf("Assertion 2 TestEncryptBlocAES de encrypt_test FAILED.")
     }
 	
 }
