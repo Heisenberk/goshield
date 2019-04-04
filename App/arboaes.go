@@ -1,4 +1,4 @@
-package main
+package App
 
 import (
     "crypto/aes"
@@ -29,7 +29,7 @@ func chemin(path string,name string,isdir bool){
         if(isdir ){
         path =path+name+"/"
 
-        lister(path)
+        Lister(path)
         //fmt.Println(path)
         path=strings.TrimRight(path,"/")
         path=strings.TrimRight(path,name)
@@ -187,7 +187,7 @@ func ecrire_encryption_file(name string,Mode os.FileMode){
     }
 }	
 
-func lister(path string){
+func Lister(path string){
     
     fi, err := os.Stat(path)
     
@@ -267,6 +267,7 @@ func give_me_the_name_of(path string){
 
 }
 }
+/*
 func main() {
 
 
@@ -287,3 +288,4 @@ func main() {
 
 
 }
+*/

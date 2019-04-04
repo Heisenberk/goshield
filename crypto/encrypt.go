@@ -65,6 +65,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		return errors.New(texteError)
 	}
 
+
 	fmt.Printf("The file is %d bytes long", stat.Size())
 	// vérification de la bonne permission
 	if stat.Mode().String()[1]=='-' {
@@ -72,12 +73,13 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		return errors.New(texteError)
 	}
 
+
 	var division int = (int)(stat.Size()/aes.BlockSize)
 	var iterations int = division
 	if (int)(stat.Size())%aes.BlockSize != 0 {
 		iterations=iterations+1
 	}
-	fmt.Printf("\nnb iterations : %d\n",iterations)
+	//fmt.Printf("\nnb iterations : %d\n",iterations)
 
 	// ouverture du fichier résultat
     outputFile, err3 := os.Create(pathFile+".gsh")
@@ -123,6 +125,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	}else {
 		length=(int)(stat.Size())%aes.BlockSize
 	}
+
 	fmt.Printf("Taille du dernier bloc chiffré : %d\n", length)
 	lengthWritten := make([]byte, 1)
 	lengthWritten[0]=byte(length)
