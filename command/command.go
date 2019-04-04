@@ -283,8 +283,22 @@ crypto.EncryptFileAES(getname_file(path),d)
 
        
 }
-func lister_dech(path string,d *structure.Documents){
-        entries, err := ioutil.ReadDir(path)
+func Lister_dechiffre(path string,d *structure.Documents){
+    
+    fi, err := os.Stat(path)
+    
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    mode := fi.Mode();
+    //fmt.Println(mode.IsRegular())
+    if(mode.IsDir()==true){
+    	if(strings.LastIndexAny(path, "/") != len(path) - 1){
+        path=path+ string(os.PathSeparator)
+    }
+    
+   entries, err := ioutil.ReadDir(path)
          //path=strings.TrimRight(path,"/")
 
     if err != nil {
@@ -293,12 +307,27 @@ func lister_dech(path string,d *structure.Documents){
     }
     for _, entry := range entries {
 
-        ecrire_dech(path,entry.Name(),entry.IsDir(),entry.Mode())
-    chemin(path,entry.Name(),entry.IsDir(),d)
-   
+ 
+   //ecrire_encryption(path,entry.Name(),entry.IsDir(),entry.Mode()) 
+
+
+    	
+    	crypto.DecryptFileAES(path+entry.Name(),d)
+    	    fmt.Println(path+entry.Name())
+    	
+chemin(path,entry.Name(),entry.IsDir(),d)
+
 }
+}else if(mode.IsRegular()==true){
+
+crypto.DecryptFileAES(getname_file(path),d)
+  //ecrire_encryption_file(getname_file(path),mode) 
+
+    }
 
 
+
+       
 }
 
 func give_me_the_name_of(path string){
@@ -335,7 +364,9 @@ func Interpret( d  *structure.Documents ,err error ) {
 			
 		}
 		if(d.Mode == 2){
-
+			for i := 0; i < len(d.Doc); i++ {
+				Lister_dechiffre(d.Doc[i],d)
+			}
 		}
 
 		
