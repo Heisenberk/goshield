@@ -27,12 +27,30 @@ func Interpret( d  *structure.Documents ,err error ) {
 
 // main représente la fonction principale de GoShield.
 func main() {
+
+	/*iv:= []byte {36,31,225, 245, 191, 97, 106, 191, 99, 77, 129, 76, 26, 190, 87, 210}
+	key:=[]byte{221, 91, 116, 74, 157, 205, 95, 243, 70, 54, 127, 92, 228, 182, 231, 250, 24, 218, 112, 62, 5, 92, 209, 96, 143, 79, 23, 101, 86, 183, 149, 61}
+	input:=[]byte{22, 249, 179, 58, 118, 104, 69, 215, 203, 66, 204, 255, 210, 32, 175, 2}
+	//var ouput []byte
+	output, _:= crypto.DecryptBlocAES(iv , key , input )
+	fmt.Println(output)*/
+
+
 	var d structure.Documents
 	d.Password = "password"
-	err := crypto.EncryptFileAES("test5.txt", &d)
+	err := crypto.DecryptFileAES("./env/test6.md.gsh", &d)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	/*var d structure.Documents
+	d.Password = "password"
+	err := crypto.EncryptFileAES("./env/test/test6.md", &d)
+	if err != nil {
+		fmt.Println(err)
+	}*/
+
+
 	/*var d *structure.Documents
 	d, err := command.Parse(os.Args[1:])
 	fmt.Println(d)
