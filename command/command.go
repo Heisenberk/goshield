@@ -64,14 +64,27 @@ func Parse(arg []string) (*structure.Documents, error) {
 		return nil, errors.New("Commande non reconnue. ")
 	}
 }
-//met à jour le chemin à chaque fois que l'on rencontre un dossier,
-//Pour cela, on ajoute le nom du dossier dans le chemin
-func chemin(path string,name string,isdir bool, d  *structure.Documents){
+//Met à jour le chemin à chaque fois que l'on rencontre un dossier,
+//Pour cela, on ajoute le nom du dossier dans le chemin (= dans le cas du chiffrement d'un dossier)
+func Maj_Chemin_Crypt(path string,name string,isdir bool, d  *structure.Documents){
         //si l'objet spécifié par le chemin est un dossier
         if(isdir ){
 
         path =path+name+"/"
-        Lister(path,d)
+        Chiffre_DossierOuFichier(path,d)
+        path=strings.TrimRight(path,"/")
+        path=strings.TrimRight(path,name)
+
+    }
+}
+//Met à jour le chemin à chaque fois que l'on rencontre un dossier,
+//Pour cela, on ajoute le nom du dossier dans le chemin (= dans le cas du déchiffrement d'un dossier)
+func Maj_Chemin_Decypt(path string,name string,isdir bool, d  *structure.Documents){
+        //si l'objet spécifié par le chemin est un dossier
+        if(isdir ){
+
+        path =path+name+"/"
+        Dechiffre_DossierOuFichier(path,d)
         path=strings.TrimRight(path,"/")
         path=strings.TrimRight(path,name)
 
@@ -81,7 +94,7 @@ func chemin(path string,name string,isdir bool, d  *structure.Documents){
 //Chiffre le contenu d'un document si l'objet spécifié par le chemin est un dossier
 //sinon
 //l'objet spécifié par le chemin est un fichier alors on chiffre ce fichier 
-func Lister(path string,d *structure.Documents){
+func Chiffre_DossierOuFichier(path string,d *structure.Documents){
     
     fi, err := os.Stat(path)
     
@@ -114,20 +127,20 @@ func Lister(path string,d *structure.Documents){
     	   fmt.Println(path+entry.Name())
     	}
         //Si on tombe sur un dossier on met à jour le chemin
-        chemin(path,entry.Name(),entry.IsDir(),d)
+       Maj_Chemin_Crypt(path,entry.Name(),entry.IsDir(),d)
 
     }
     //si l'objet spécifié par le chemin est un fichier
     }else if(mode.IsRegular()==true){
 
-        crypto.EncryptFileAES(getname_file(path),d)
+     crypto.EncryptFileAES(getname_file(path),d)
     }
 
 }
 //Déchiffre le contenu d'un document si l'objet spécifié par le chemin est un dossier
 //sinon
 //l'objet spécifié par le chemin est un fichier alors on déchiffre ce fichier 
-func Lister_dechiffre(path string,d *structure.Documents){
+func Dechiffre_DossierOuFichier(path string,d *structure.Documents){
     
     fi, err := os.Stat(path)
     
@@ -155,7 +168,7 @@ func Lister_dechiffre(path string,d *structure.Documents){
     	   crypto.DecryptFileAES(path+entry.Name(),d)
     	   fmt.Println(path+entry.Name())
            //Si on tombe sur un dossier on met à jour le chemin
-            chemin(path,entry.Name(),entry.IsDir(),d)
+            Maj_Chemin_Decypt(path,entry.Name(),entry.IsDir(),d)
 
         }
     //si l'objet spécifié par le chemin est un fichier
@@ -180,14 +193,15 @@ func Interpret( d  *structure.Documents ,err error ) {
 
 	if (err==nil){
 		if(d.Mode == 1){
-			for i := 0; i < len(d.Doc); i++ {
-				Lister(d.Doc[i],d)
+
+			for i := 1; i < len(d.Doc); i++ {
+			     Chiffre_DossierOuFichier(d.Doc[i],d)
 			}
 			
 		}
 		if(d.Mode == 2){
 			for i := 0; i < len(d.Doc); i++ {
-				Lister_dechiffre(d.Doc[i],d)
+				Dechiffre_DossierOuFichier(d.Doc[i],d)
 			}
 		}
 

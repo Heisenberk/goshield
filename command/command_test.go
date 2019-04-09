@@ -2,6 +2,7 @@
 package command
 
 import "testing"
+//import "io/ioutil"
 import "github.com/Heisenberk/goshield/structure"
 
 // TestSansArgument teste la commande "./goshield"
