@@ -117,6 +117,10 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		return errors.New(texteError)
 	}
 
+		fmt.Println(iterations)
+		fmt.Println(length)
+		fmt.Println(aes.BlockSize)
+
 	// chiffrement de chaque bloc de données et ecriture des donnees chiffrees
 	input := make([]byte, 16)
 	var cipherBlock []byte
@@ -215,7 +219,6 @@ func EncryptFolder (path string, d *structure.Documents) {
 }
 
 func EncryptFileFolder(d *structure.Documents) {
-
     for i := 0; i < len(d.Doc); i++ {
         fi, err := os.Stat(d.Doc[i])
         valid := true

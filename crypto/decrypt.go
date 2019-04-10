@@ -109,6 +109,10 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 	input := make([]byte, 16)
 	var cipherBlock []byte
 	temp := make([]byte, 16)
+
+	fmt.Println(iterations)
+	fmt.Println(lengthTab)
+	fmt.Println("coucou")
 	
 	for i:=0 ; i<iterations ; i++ {
 
@@ -139,14 +143,24 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 		
 		// dans le dernier bloc, il faut enlever les bits de padding qui ne sont pas dans le message initial.
 		if i==(iterations-1) {
-			_, err11 := outputFile.Write(cipherBlock[:lengthTab[0]])
-			if err11 != nil {
-  				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
-				return errors.New(texteError)
+			if lengthTab[0]!= 0 {
+				_, err11 := outputFile.Write(cipherBlock[:lengthTab[0]])
+				if err11 != nil {
+  					var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
+					return errors.New(texteError)
+				}
+			}else {
+				_, err12 := outputFile.Write(cipherBlock)
+				if err12 != nil {
+  					var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
+					return errors.New(texteError)
+				}
 			}
+			
+			
 		}else {
-			_, err11 := outputFile.Write(cipherBlock)
-			if err11 != nil {
+			_, err13 := outputFile.Write(cipherBlock)
+			if err13 != nil {
   				var texteError string = "Failure Decryption : Impossible d'écrire dans le fichier "+nameOutput+". "
 				return errors.New(texteError)
 			}
@@ -172,9 +186,8 @@ func DecryptFolder (path string, d *structure.Documents) {
     }
     for _, entry := range entries {
 
-        p:=path + entry.Name()
         // si l'extension du fichier est différent de .gsh on peut chiffrer le fichier
-        if(p[len(p)-4:]==".gsh"){
+        //if(p[len(p)-4:]==".gsh"){
 
            //crypto.EncryptFileAES(path+entry.Name(),d)
            
@@ -202,14 +215,17 @@ func DecryptFolder (path string, d *structure.Documents) {
 
                 // si l'objet spécifié par le chemin est un fichier.
                 }else if mode.IsRegular()== true {
-                    errFile := DecryptFileAES(newPath,d)
-                    if errFile != nil {
-                        fmt.Println(errFile)
-                    }
+                	if newPath[len(newPath)-4:]==".gsh"{
+                		errFile := DecryptFileAES(newPath,d)
+                    	if errFile != nil {
+                        	fmt.Println(errFile)
+                    	}
+                	}
+                    
                 }
 
             }
-        }
+        //}
     }
 }
 
