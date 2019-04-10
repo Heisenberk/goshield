@@ -10,6 +10,7 @@ import "fmt"
 
 import "github.com/Heisenberk/goshield/structure"
 
+// CreateIV génère une valeur initiale IV aléatoire. 
 func CreateIV() []byte {
 	rand.Seed(time.Now().UnixNano())
 	iv := make([]byte, 16)
@@ -17,6 +18,7 @@ func CreateIV() []byte {
 	return iv
 }
 
+// EncryptBlocAES chiffre 1 bloc input avec la clé key et la valeur initiale iv pour donner le bloc chiffré. 
 func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 
 	// Résultat du chiffrement sera dans output.
@@ -40,6 +42,7 @@ func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 	return output, nil
 }
 
+// EncryptFileAES chiffre un fichier de chemin pathFile avec les données doc. 
 func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 
 	// ouverture du fichier a chiffrer
@@ -148,6 +151,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		}
 	}
 
+	// fermeture des fichiers. 
     outputFile.Close()
     inputFile.Close()
 

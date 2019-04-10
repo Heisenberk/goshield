@@ -8,6 +8,7 @@ import "fmt"
 
 import "github.com/Heisenberk/goshield/structure"
 
+// DecryptBlocAES déchiffre 1 bloc input avec la clé key et la valeur initiale iv pour donner le bloc déchiffré. 
 func DecryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error){
 
 	// Résultat du chiffrement sera dans output.
@@ -31,6 +32,7 @@ func DecryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error){
 	return input, nil
 }
 
+// DecryptFileAES déchiffre un fichier de chemin pathFile avec les données doc. 
 func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 	
 	// ouverture du fichier à déchiffrer
@@ -105,6 +107,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 	input := make([]byte, 16)
 	var cipherBlock []byte
 	temp := make([]byte, 16)
+	
 	for i:=0 ; i<iterations ; i++ {
 
     	// si on est au tour i (i!=0), IV vaut le chiffré du tour i-1
@@ -148,6 +151,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents) error{
 		}
 	}
 
+	// fermeture des fichiers. 
 	inputFile.Close()
 	outputFile.Close()
 
