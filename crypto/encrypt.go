@@ -7,6 +7,8 @@ import "crypto/cipher"
 import "os"
 import "errors"
 import "fmt"
+import "io/ioutil"
+import "strings"
 
 import "github.com/Heisenberk/goshield/structure"
 
@@ -159,4 +161,91 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
     fmt.Println(messageSuccess)
     return nil
 
+}
+
+func EncryptFolder (path string, d *structure.Documents) {
+    //On lit dans le dossier visée par le chemin
+   entries, err := ioutil.ReadDir(path)
+
+    if err != nil {
+        fmt.Println("- Failure Encryption : impossible d'ouvrir "+path)
+    }
+    for _, entry := range entries {
+
+        p:=path + entry.Name()
+        // si l'extension du fichier est différent de .gsh on peut chiffrer le fichier
+        if(p[len(p)-4:]!=".gsh"){
+
+           //crypto.EncryptFileAES(path+entry.Name(),d)
+           
+           newPath := path+entry.Name()
+           //fmt.Println(newPath)
+
+           fi, err := os.Stat(newPath)
+            valid := true
+            if err != nil {
+                fmt.Println("- Failure Encryption : "+newPath+" n'existe pas ")
+                valid = false
+            }
+
+            if valid == true {
+                mode := fi.Mode();
+
+                //si l'objet spécifié par le chemin est un dossier.
+                if(mode.IsDir()==true){
+
+                    //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
+                    if(strings.LastIndexAny(newPath, "/") != len(newPath) - 1){
+                      newPath=newPath+ string(os.PathSeparator)
+                      //appeler EncryptFolder
+                      EncryptFolder(newPath, d)
+                    }
+
+                // si l'objet spécifié par le chemin est un fichier.
+                }else if mode.IsRegular()== true {
+                    errFile := EncryptFileAES(newPath,d)
+                    if errFile != nil {
+                        fmt.Println(errFile)
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+func EncryptFileFolder(d *structure.Documents) {
+
+    for i := 0; i < len(d.Doc); i++ {
+        fi, err := os.Stat(d.Doc[i])
+        valid := true
+        if err != nil {
+            fmt.Println("- Failure Encryption : "+d.Doc[i]+" n'existe pas ")
+            valid = false
+        }
+
+        if valid == true {
+            mode := fi.Mode();
+
+            //si l'objet spécifié par le chemin est un dossier.
+            if(mode.IsDir()==true){
+
+                //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
+                if(strings.LastIndexAny(d.Doc[i], "/") != len(d.Doc[i]) - 1){
+                  d.Doc[i]=d.Doc[i]+ string(os.PathSeparator)
+                  //appeler EncryptFolder
+                  EncryptFolder(d.Doc[i], d)
+                }
+
+            // si l'objet spécifié par le chemin est un fichier.
+            }else if mode.IsRegular()== true {
+                errFile := EncryptFileAES(d.Doc[i],d)
+                if errFile != nil {
+                    fmt.Println(errFile)
+                }
+            }
+
+        }
+        
+    }
 }

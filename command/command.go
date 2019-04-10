@@ -1,15 +1,7 @@
 // Package command contenant les fonctions de parsing pour interpréter les commandes de l'utilisateur.
 package command
 
-import (
-
-    "fmt"
-    "io/ioutil"
-    "strings"
-    "os"
-
-
-)
+import "fmt"
 import "errors"
 import "github.com/Heisenberk/goshield/structure"
 import "github.com/Heisenberk/goshield/crypto"
@@ -68,24 +60,20 @@ func Interpret(d  *structure.Documents, err error) {
     if (err==nil){
         // réalisation d'un chiffrement. 
         if(d.Mode == structure.ENCRYPT){
-            EncryptFileFolderClement(d)
-            /*for i := 0; i < len(d.Doc); i++ {
-                fmt.Println("coucou")
-                //EncryptFileFolder(d.Doc[i],d)
-            }*/
+            crypto.EncryptFileFolder(d)
         }
 
         // réalisation d'un déchiffrement. 
         if(d.Mode == structure.DECRYPT){
-            for i := 0; i < len(d.Doc); i++ {
-                Dechiffre_DossierOuFichier(d.Doc[i],d)
-            }
+            crypto.DecryptFileFolder(d)
         } 
 
     // si l'utilisateur ne tape aucun argument, on affiche les commandes. 
     }else if(err.Error()=="Aucun argument. "){
 
-        fmt.Println("\nCommande de GoShield : \n")
+        fmt.Println("");
+        fmt.Println("Commande de GoShield : ")
+        fmt.Println("");
         fmt.Println("-e/--encrypt : permet de choisir de chiffrer ")
         fmt.Println("-d/--decrypt : permet de choisir de  déchiffrer")
         fmt.Println("-p[password] : permet de taper le mot de passe " )
@@ -97,219 +85,6 @@ func Interpret(d  *structure.Documents, err error) {
     }
 }
 
-func EncryptFolder (path string, d *structure.Documents) {
-    //On lit dans le dossier visée par le chemin
-   entries, err := ioutil.ReadDir(path)
-
-    if err != nil {
-        fmt.Println("- Failure Encryption : impossible d'ouvrir "+path)
-    }
-    for _, entry := range entries {
-
-        p:=path + entry.Name()
-        // si l'extension du fichier est différent de .gsh on peut chiffrer le fichier
-        if(p[len(p)-4:]!=".gsh"){
-
-           //crypto.EncryptFileAES(path+entry.Name(),d)
-           
-           newPath := path+entry.Name()
-           fmt.Println(newPath)
-
-           fi, err := os.Stat(newPath)
-            valid := true
-            if err != nil {
-                fmt.Println("- Failure Encryption : "+newPath+" n'existe pas ")
-                valid = false
-            }
-
-            if valid == true {
-                mode := fi.Mode();
-
-                //si l'objet spécifié par le chemin est un dossier.
-                if(mode.IsDir()==true){
-
-                    //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
-                    if(strings.LastIndexAny(newPath, "/") != len(newPath) - 1){
-                      newPath=newPath+ string(os.PathSeparator)
-                      //appeler EncryptFolder
-                      EncryptFolder(newPath, d)
-                    }
-
-                // si l'objet spécifié par le chemin est un fichier.
-                }else if mode.IsRegular()== true {
-                    errFile := crypto.EncryptFileAES(newPath,d)
-                    if errFile != nil {
-                        fmt.Println(errFile)
-                    }
-                }
-
-            }
-        }
-    }
-}
-
-func EncryptFileFolderClement(d *structure.Documents) {
-
-    for i := 0; i < len(d.Doc); i++ {
-        fi, err := os.Stat(d.Doc[i])
-        valid := true
-        if err != nil {
-            fmt.Println("- Failure Encryption : "+d.Doc[i]+" n'existe pas ")
-            valid = false
-        }
-
-        if valid == true {
-            mode := fi.Mode();
-
-            //si l'objet spécifié par le chemin est un dossier.
-            if(mode.IsDir()==true){
-
-                //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
-                if(strings.LastIndexAny(d.Doc[i], "/") != len(d.Doc[i]) - 1){
-                  d.Doc[i]=d.Doc[i]+ string(os.PathSeparator)
-                  //appeler EncryptFolder
-                  EncryptFolder(d.Doc[i], d)
-                }
-
-            // si l'objet spécifié par le chemin est un fichier.
-            }else if mode.IsRegular()== true {
-                errFile := crypto.EncryptFileAES(d.Doc[i],d)
-                if errFile != nil {
-                    fmt.Println(errFile)
-                }
-            }
-
-        }
-        
-    }
-}
 
 
-//Chiffre le contenu d'un document si l'objet spécifié par le chemin est un dossier
-//sinon
-//l'objet spécifié par le chemin est un fichier alors on chiffre ce fichier 
-func EncryptFileFolder(path string, d *structure.Documents){
-    fmt.Println("1")
-    // ouverture du fichier pour lire les métadonnées du fichier/dossier. 
-    fi, err := os.Stat(path)
-    if err != nil {
-        fmt.Println(err)
-    }
-    fmt.Println("11")
-    mode := fi.Mode();
 
-    //si l'objet spécifié par le chemin est un dossier.
-    if(mode.IsDir()==true){
-        fmt.Println("2")
-        //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
-        if(strings.LastIndexAny(path, "/") != len(path) - 1){
-
-            path=path+ string(os.PathSeparator)
-        }
-    //On lit dans le dossier visée par le chemin
-   entries, err := ioutil.ReadDir(path)
-   fmt.Println("3")
-
-    if err != nil {
-
-        fmt.Println(err)
-    }
-    fmt.Println("4")
-    for _, entry := range entries {
-
-        p:=path + entry.Name()
-        // si l'extension du fichier est différent de .gsh on peut chiffrer le fichier
-        if(p[len(p)-4:]!=".gsh"){
-
-           crypto.EncryptFileAES(path+entry.Name(),d)
-           fmt.Println(path+entry.Name())
-        }
-        //Si on tombe sur un dossier on met à jour le chemin
-       Maj_Chemin_Crypt(path,entry.Name(),entry.IsDir(),d)
-
-    }
-    //si l'objet spécifié par le chemin est un fichier
-    }else if(mode.IsRegular()==true){
-
-     crypto.EncryptFileAES(getname_file(path),d)
-    }
-
-}
-
-//Met à jour le chemin à chaque fois que l'on rencontre un dossier,
-//Pour cela, on ajoute le nom du dossier dans le chemin (= dans le cas du chiffrement d'un dossier)
-func Maj_Chemin_Crypt(path string,name string,isdir bool, d  *structure.Documents){
-        //si l'objet spécifié par le chemin est un dossier
-        if(isdir ){
-
-        path =path+name+"/"
-        EncryptFileFolder(path,d)
-        path=strings.TrimRight(path,"/")
-        path=strings.TrimRight(path,name)
-
-    }
-}
-//Met à jour le chemin à chaque fois que l'on rencontre un dossier,
-//Pour cela, on ajoute le nom du dossier dans le chemin (= dans le cas du déchiffrement d'un dossier)
-func Maj_Chemin_Decypt(path string,name string,isdir bool, d  *structure.Documents){
-        //si l'objet spécifié par le chemin est un dossier
-        if(isdir ){
-
-        path =path+name+"/"
-        Dechiffre_DossierOuFichier(path,d)
-        path=strings.TrimRight(path,"/")
-        path=strings.TrimRight(path,name)
-
-    }
-}
-
-//Déchiffre le contenu d'un document si l'objet spécifié par le chemin est un dossier
-//sinon
-//l'objet spécifié par le chemin est un fichier alors on déchiffre ce fichier 
-func Dechiffre_DossierOuFichier(path string,d *structure.Documents){
-    
-    fi, err := os.Stat(path)
-    
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
-    mode := fi.Mode();
-    //si l'objet spécifié par le chemin est un dossier
-    if(mode.IsDir()==true){
-        //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
-    	if(strings.LastIndexAny(path, "/") != len(path) - 1){
-
-            path=path+ string(os.PathSeparator)
-    }
-    
-   entries, err := ioutil.ReadDir(path)
-
-    if err != nil {
-
-        fmt.Println(err)
-    }
-        for _, entry := range entries {
-            //on déchiffrer le fichier spécifié par le chemin
-    	   crypto.DecryptFileAES(path+entry.Name(),d)
-    	   fmt.Println(path+entry.Name())
-           //Si on tombe sur un dossier on met à jour le chemin
-            Maj_Chemin_Decypt(path,entry.Name(),entry.IsDir(),d)
-
-        }
-    //si l'objet spécifié par le chemin est un fichier
-    }else if(mode.IsRegular()==true){
-
-        crypto.DecryptFileAES(getname_file(path),d)
-
-    }
-      
-}
-//Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
-func getname_file(path string) string {
-
-    path =strings.Trim(path,"/")
-    path=path[strings.LastIndexAny(path, "/")+1:]
-
-    return path
-}
