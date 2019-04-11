@@ -1,10 +1,12 @@
+// Package crypto contenant les fonctions de chiffrement/déchiffrement.
 package crypto
 
 import "testing"
-//import "fmt"
 import "crypto/sha256"
+
 import "github.com/Heisenberk/goshield/structure"
 
+// testEgaliteSlice renvoie true si les deux slices sont égaux et false sinon. 
 func testEgaliteSlice(a, b []byte) bool {
 	if len(a)!= len(b){
 		return false
@@ -17,6 +19,7 @@ func testEgaliteSlice(a, b []byte) bool {
 	return true
 }
 
+// Test la bonne création d'un hash. 
 func TestCreateHash(t *testing.T) {
 	salt := []byte{84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 84}
 	doc := structure.Documents{Mode: structure.ENCRYPT, Password: "password", Salt: salt}

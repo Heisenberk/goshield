@@ -1,23 +1,10 @@
-
+// Package crypto contenant les fonctions de chiffrement/déchiffrement.
 package crypto
 
 import "testing"
 import "encoding/hex"
-//import "fmt"
 
-
-/*func TestXor(t *testing.T) {
-	a := []byte{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	b := []byte{254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254}
-	c := Xor (a, b)
-	test := []byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}
-
-	if testEgaliteSlice(test, c) == false {
-    	t.Errorf("Assertion TestXor de encrypt_test FAILED.")
-    }
-
-}*/
-
+// Test qui chiffre un bloc. 
 func TestEncryptBlocAES(t *testing.T){
 	// IV sur 16 octets (128 bits).
 	iv := []byte{170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170}

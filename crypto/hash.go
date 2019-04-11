@@ -1,3 +1,4 @@
+// Package crypto contenant les fonctions de chiffrement/déchiffrement.
 package crypto
 
 import "crypto/sha256"
@@ -33,7 +34,6 @@ func CreateHash(doc *structure.Documents) {
     // génération du hash. 
     hash.Write(concat)
     doc.Hash = hash.Sum(nil)
-
 }
 
 // DeductHash va déduire SHA256(salt|password) avec salt déjà initialisé. 

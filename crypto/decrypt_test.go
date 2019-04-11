@@ -1,3 +1,4 @@
+// Package crypto contenant les fonctions de chiffrement/déchiffrement.
 package crypto
 
 import "testing"
@@ -8,6 +9,7 @@ import "bytes"
 
 import "github.com/Heisenberk/goshield/structure"
 
+// Test de chiffrement sur un bloc. 
 func TestDecryptBlocAES(t *testing.T){
 
     // IV sur 16 octets (128 bits).
@@ -32,6 +34,7 @@ func TestDecryptBlocAES(t *testing.T){
 	
 }
 
+// Test de chiffrement suivi de déchiffrement sur le fichier env/test/test6.md
 func TestEncryptDecryptFile(t * testing.T){
 
 	var d structure.Documents

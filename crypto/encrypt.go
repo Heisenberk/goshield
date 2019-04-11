@@ -1,3 +1,4 @@
+// Package crypto contenant les fonctions de chiffrement/déchiffrement.
 package crypto
 
 import "math/rand"
@@ -28,13 +29,13 @@ func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 
 	// Si la taille de l'entrée est invalide on lance une erreur. 
 	if len(input)%aes.BlockSize != 0 {
-		return output, errors.New("Failure Encryption : Taille du bloc invalide.")
+		return output, errors.New("\033[31mFailure Encryption\033[0m : Taille du bloc invalide.")
 	}
 
 	// Preparation du bloc qui sera chiffré. 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return output, errors.New("Failure Encryption : Erreur lors du chiffrement d'un bloc.")
+		return output, errors.New("\033[31mFailure Encryption\033[0m : Erreur lors du chiffrement d'un bloc.")
 	}
 
 	// Chiffrement AES avec le mode opératoire CBC.
@@ -50,21 +51,20 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	// ouverture du fichier a chiffrer
 	inputFile, err1 := os.Open(pathFile) 
 	if err1 != nil {
-		var texteError string = "Failure Encryption : Impossible d'ouvrir le fichier à chiffrer "+pathFile+". "
+		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'ouvrir le fichier à chiffrer "+pathFile+". "
 		return errors.New(texteError)
 	}
 	stat, err2 := inputFile.Stat()
 	if err2 != nil {
-  		var texteError string = "Failure Encryption : Impossible d'interpréter le fichier à chiffrer "+pathFile+". "
+  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'interpréter le fichier à chiffrer "+pathFile+". "
 		return errors.New(texteError)
 	}
 
 	// vérification de la bonne permission
 	if stat.Mode().String()[1]=='-' {
-		var texteError string = "Failure Encryption : Permission du fichier à chiffrer "+pathFile+" incorrecte . "
+		var texteError string = "\033[31mFailure Encryption\033[0m : Permission du fichier à chiffrer "+pathFile+" incorrecte . "
 		return errors.New(texteError)
 	}
-
 
 	var division int = (int)(stat.Size()/aes.BlockSize)
 	var iterations int = division
@@ -75,14 +75,14 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	// ouverture du fichier résultat
     outputFile, err3 := os.Create(pathFile+".gsh")
     if err3 != nil {
-  		var texteError string = "Failure Encryption : Impossible d'écrire le fichier chiffré "+pathFile+".gsh. "
+  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire le fichier chiffré "+pathFile+".gsh. "
 		return errors.New(texteError)
 	}
 
 	// ecriture de la signature
 	_, err4 := outputFile.WriteString("GOSHIELD")
     if err4 != nil {
-  		var texteError string = "Failure Encryption : Impossible d'écrire dans le fichier chiffré "+pathFile+".gsh. "
+  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire dans le fichier chiffré "+pathFile+".gsh. "
 		return errors.New(texteError) 
 	}
 
@@ -90,7 +90,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	CreateHash(doc)
 	_, err5 := outputFile.Write(doc.Salt)
 	if err5 != nil {
-  		var texteError string = "Failure Encryption : Impossible de générer le salt. "
+  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible de générer le salt. "
 		return errors.New(texteError)
 	}
 
@@ -98,7 +98,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	IV := CreateIV()
 	_, err6 := outputFile.Write(IV)
     if err6 != nil {
-  		var texteError string = "Failure Encryption : Impossible d'écrire la valeur d'initialisation IV. "
+  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire la valeur d'initialisation IV. "
 		return errors.New(texteError) 
 	}
 
@@ -113,13 +113,9 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 	lengthWritten[0]=byte(length)
 	_, err7 := outputFile.Write(lengthWritten)
 	if err7 != nil {
-  		var texteError string = "Failure Encryption : Impossible d'écrire la taille du dernier bloc chiffré. "
+  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire la taille du dernier bloc chiffré. "
 		return errors.New(texteError)
 	}
-
-		fmt.Println(iterations)
-		fmt.Println(length)
-		fmt.Println(aes.BlockSize)
 
 	// chiffrement de chaque bloc de données et ecriture des donnees chiffrees
 	input := make([]byte, 16)
@@ -132,7 +128,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		// lecture de chaque bloc de 16 octets
 		_, err8 := inputFile.Read(input)
 		if err8 != nil {
-  			var texteError string = "Failure Encryption : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
+  			var texteError string = "\033[31mFailure Encryption\033[0m : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
 			return errors.New(texteError)
 		}
 
@@ -145,14 +141,14 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
 		var err10 error
 		cipherBlock, err10 = EncryptBlocAES(IV, doc.Hash, input)
 		if err10 != nil {
-			var texteError string = "Failure Encryption : Impossible de chiffrer le fichier "+pathFile+". "
+			var texteError string = "\033[31mFailure Encryption\033[0m : Impossible de chiffrer le fichier "+pathFile+". "
 			return errors.New(texteError)
 		}
 
 		// écriture du bloc chiffré
 		_, err11 := outputFile.Write(cipherBlock)
 		if err11 != nil {
-  			var texteError string = "Failure Encryption : Impossible d'écrire dans le fichier "+pathFile+".gsh. "
+  			var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire dans le fichier "+pathFile+".gsh. "
 			return errors.New(texteError)
 		}
 	}
@@ -161,94 +157,103 @@ func EncryptFileAES(pathFile string, doc *structure.Documents) error{
     outputFile.Close()
     inputFile.Close()
 
-    var messageSuccess string = "- Success Encryption : "+pathFile+" : resultat dans le fichier "+pathFile+".gsh"
+    var messageSuccess string = "- \033[32mSuccess Encryption\033[0m : "+pathFile+" : resultat dans le fichier "+pathFile+".gsh"
     fmt.Println(messageSuccess)
     return nil
 
 }
 
+// EncryptFolder chiffre le contenu d'un dossier de chemin path avec les données doc. 
 func EncryptFolder (path string, d *structure.Documents) {
-    //On lit dans le dossier visée par le chemin
-   entries, err := ioutil.ReadDir(path)
 
+    // On lit dans le dossier visée par le chemin
+   entries, err := ioutil.ReadDir(path)
     if err != nil {
-        fmt.Println("- Failure Encryption : impossible d'ouvrir "+path)
+        fmt.Println("- \033[31mFailure Encryption\033[0m : impossible d'ouvrir "+path)
     }
+
+    // Pour chaque élément du dossier. 
     for _, entry := range entries {
 
         p:=path + entry.Name()
-        // si l'extension du fichier est différent de .gsh on peut chiffrer le fichier
-        if(p[len(p)-4:]!=".gsh"){
 
-           //crypto.EncryptFileAES(path+entry.Name(),d)
+        // Si l'extension du fichier est différent de .gsh on peut chiffrer le fichier
+        if(p[len(p)-4:]!=".gsh"){
            
            newPath := path+entry.Name()
-           //fmt.Println(newPath)
-
            fi, err := os.Stat(newPath)
             valid := true
             if err != nil {
-                fmt.Println("- Failure Encryption : "+newPath+" n'existe pas ")
+                fmt.Println("- \033[31mFailure Encryption\033[0m : "+newPath+" n'existe pas ")
                 valid = false
             }
 
+            // Si l'élément du dossier est valide. 
             if valid == true {
+
                 mode := fi.Mode();
 
-                //si l'objet spécifié par le chemin est un dossier.
+                // Si l'objet spécifié par le chemin est un dossier.
                 if(mode.IsDir()==true){
 
-                    //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
+                    // Si l'utilisateur a oublié le "/" à la fin du chemin du fichier.
                     if(strings.LastIndexAny(newPath, "/") != len(newPath) - 1){
                       newPath=newPath+ string(os.PathSeparator)
-                      //appeler EncryptFolder
-                      EncryptFolder(newPath, d)
                     }
+                    // Chiffrement du dossier. 
+                    EncryptFolder(newPath, d)
 
-                // si l'objet spécifié par le chemin est un fichier.
+                // Si l'objet spécifié par le chemin est un fichier.
                 }else if mode.IsRegular()== true {
                     errFile := EncryptFileAES(newPath,d)
                     if errFile != nil {
                         fmt.Println(errFile)
                     }
                 }
-
             }
         }
     }
 }
 
+// DecryptFileFolder déchiffre les éléments choisis par l'utilisateur avec les données doc. 
 func EncryptFileFolder(d *structure.Documents) {
+
+	// Pour chaque élément choisi par l'utilisateur. 
     for i := 0; i < len(d.Doc); i++ {
+
+    	// Lecture de cet élément. 
         fi, err := os.Stat(d.Doc[i])
         valid := true
         if err != nil {
-            fmt.Println("- Failure Encryption : "+d.Doc[i]+" n'existe pas ")
+            fmt.Println("- \033[31mFailure Encryption\033[0m : "+d.Doc[i]+" n'existe pas ")
             valid = false
         }
 
+        // Si cet élément est valide. 
         if valid == true {
             mode := fi.Mode();
 
-            //si l'objet spécifié par le chemin est un dossier.
+            // Si l'objet spécifié par le chemin est un dossier.
             if(mode.IsDir()==true){
 
-                //Si l'utilisateur a oublié le "/" à la fin du chemin du fichier
+                // Si l'utilisateur a oublié le "/" à la fin du chemin du fichier. 
                 if(strings.LastIndexAny(d.Doc[i], "/") != len(d.Doc[i]) - 1){
                   d.Doc[i]=d.Doc[i]+ string(os.PathSeparator)
-                  //appeler EncryptFolder
-                  EncryptFolder(d.Doc[i], d)
+                  
                 }
 
-            // si l'objet spécifié par le chemin est un fichier.
+                // Chiffrement du dossier. 
+                EncryptFolder(d.Doc[i], d)
+
+            // Si l'objet spécifié par le chemin est un fichier.
             }else if mode.IsRegular()== true {
+
+            	// Chiffrement du fichier. 
                 errFile := EncryptFileAES(d.Doc[i],d)
                 if errFile != nil {
                     fmt.Println(errFile)
                 }
             }
-
         }
-        
     }
 }

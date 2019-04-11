@@ -3,6 +3,7 @@ package command
 
 import "fmt"
 import "errors"
+
 import "github.com/Heisenberk/goshield/structure"
 import "github.com/Heisenberk/goshield/crypto"
 
