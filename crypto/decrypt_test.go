@@ -6,6 +6,7 @@ import "encoding/hex"
 import "os"
 import "io/ioutil"
 import "bytes"
+import "sync"
 
 import "github.com/Heisenberk/goshield/structure"
 
@@ -37,12 +38,18 @@ func TestDecryptBlocAES(t *testing.T){
 // Test de chiffrement suivi de déchiffrement sur le fichier env/test/test6.md
 func TestEncryptDecryptFile(t * testing.T){
 
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	channel := make (chan error)
+
 	var d structure.Documents
 	d.Password = "password"
-	err1 := EncryptFileAES("../env/test/test6.md", &d)
+	go EncryptFileAES("../env/test/test6.md", &d, channel, wg)
+	err1 := <- channel 
 	if err1 != nil {
 		t.Errorf("Erreur 1 TestEncryptDecryptFile de decrypt_test.")
 	}
+	wg.Wait()
 
 	err2 := os.Rename("../env/test/test6.md.gsh", "../env/test6.md.gsh")
 	if err2 != nil {
