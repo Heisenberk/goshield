@@ -56,10 +56,18 @@ func TestEncryptDecryptFile(t * testing.T){
 		t.Errorf("Erreur 2 TestEncryptDecryptFile de decrypt_test.")
 	}
 
-	err3 := DecryptFileAES("../env/test6.md.gsh", &d)
+	wg2 := &sync.WaitGroup{}
+	wg2.Add(1)
+	channel2 := make (chan error)
+
+	var d2 structure.Documents
+	d2.Password = "password"
+	go DecryptFileAES("../env/test6.md.gsh", &d2, channel2, wg2)
+	err3 := <- channel2
 	if err3 != nil {
 		t.Errorf("Erreur 3 TestEncryptDecryptFile de decrypt_test.")
 	}
+	wg2.Wait()
 
     file1, err1 := ioutil.ReadFile("../env/test/test6.md")
     if err1 != nil {
@@ -78,5 +86,5 @@ func TestEncryptDecryptFile(t * testing.T){
     }
 
     os.Remove("../env/test6.md")
-    os.Remove("../env/test6.md.gsh")
+    //os.Remove("../env/test6.md.gsh")
 }

@@ -46,21 +46,10 @@ func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 	return output, nil
 }
 
-/*func EncryptTest(pathFile string, doc *structure.Documents, channel chan error, wg *sync.WaitGroup){
-	defer wg.Done()
-	fmt.Println(pathFile)
-	if pathFile == "env/test/test3.txt" {
-		channel <- errors.New("test error channel")
-	}else{
-		channel <- errors.New("coucou")
-	} 
-	return
-	fmt.Println("cjrjj")
-}*/
-
 // EncryptFileAES chiffre un fichier de chemin pathFile avec les données doc. 
 func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan error, wg *sync.WaitGroup) {
-	//return nil
+
+	// synchronisation pour les autres goroutines. 
 	defer wg.Done()
 
 	// ouverture du fichier a chiffrer
@@ -236,7 +225,7 @@ func EncryptFolder (path string, d *structure.Documents) {
 	wgFolder.Add(countFiles)
 	channelFolder := make (chan error)
 
-    // Pour chaque élément du dossier. 
+    // Pour chaque élément du dossier, on le chiffre.
     for _, entry := range entries {
 
         p:=path + entry.Name()
@@ -272,16 +261,13 @@ func EncryptFolder (path string, d *structure.Documents) {
                 	// si l'extension du fichier est différent de .gsh on peut chiffrer le fichier.
                 	if newPath[len(newPath)-4:]!=".gsh"{
                 		go EncryptFileAES(newPath, d, channelFolder, wgFolder)
-                		/*errFile := EncryptFileAES(newPath,d)
-                    	if errFile != nil {
-                        	fmt.Println(errFile)
-                    	}*/
                 	} 
                 }
             }
         }
     }
 
+    // récupération des codes erreurs
     for _, entry := range entries {
         p:=path + entry.Name()
 
