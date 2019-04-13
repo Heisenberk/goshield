@@ -39,6 +39,7 @@ func DecryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error){
 // DecryptFileAES déchiffre un fichier de chemin pathFile avec les données doc. 
 func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan error, wg *sync.WaitGroup){
 
+	// synchronisation pour les autres goroutines.
 	defer wg.Done()
 	
 	// ouverture du fichier à déchiffrer
@@ -195,6 +196,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 // DecryptFolder déchiffre le contenu d'un dossier de chemin path avec les données doc. 
 func DecryptFolder (path string, d *structure.Documents) {
 
+	// Permettra de synchroniser le chiffrement des fichiers contenus dans le dossier. 
 	wgFolder := &sync.WaitGroup{}
 
     // Lecture du chemin à déchiffrer. 
@@ -310,6 +312,7 @@ func DecryptFolder (path string, d *structure.Documents) {
 // DecryptFileFolder déchiffre les éléments choisis par l'utilisateur avec les données doc. 
 func DecryptFileFolder(d *structure.Documents) {
 
+	// Permettra de synchroniser le chiffrement des fichiers contenus dans le dossier. 
 	wg := &sync.WaitGroup{}
 
 	// Comptage des futures goruntines à lancer. 

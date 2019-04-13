@@ -182,6 +182,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 // EncryptFolder chiffre le contenu d'un dossier de chemin path avec les données doc. 
 func EncryptFolder (path string, d *structure.Documents) {
 
+	// Permettra de synchroniser le chiffrement des fichiers contenus dans le dossier. 
 	wgFolder := &sync.WaitGroup{}
 
     // On lit dans le dossier visée par le chemin
@@ -210,7 +211,6 @@ func EncryptFolder (path string, d *structure.Documents) {
             if valid == true {
 
                 mode := fi.Mode();
-
                 if mode.IsRegular()== true {
                 	// si l'extension du fichier est différent de .gsh on peut chiffrer le fichier.
                 	if newPath[len(newPath)-4:]!=".gsh"{
@@ -267,7 +267,7 @@ func EncryptFolder (path string, d *structure.Documents) {
         }
     }
 
-    // récupération des codes erreurs
+    // Récupération des codes erreurs
     for _, entry := range entries {
         p:=path + entry.Name()
 
@@ -309,6 +309,7 @@ func EncryptFolder (path string, d *structure.Documents) {
 // DecryptFileFolder déchiffre les éléments choisis par l'utilisateur avec les données doc. 
 func EncryptFileFolder(d *structure.Documents) {
 
+	// Permettra de synchroniser le chiffrement des fichiers contenus dans le dossier. 
 	wg := &sync.WaitGroup{}
 
 	// Comptage des futures goruntines à lancer. 
@@ -333,7 +334,7 @@ func EncryptFileFolder(d *structure.Documents) {
 	wg.Add(countFiles)
 	channel := make (chan error)
 
-	// Pour chaque élément choisi par l'utilisateur. 
+	// Pour chaque élément choisi par l'utilisateur, on le chiffre. 
     for i := 0; i < len(d.Doc); i++ {
 
     	// Lecture de cet élément. 
@@ -365,10 +366,6 @@ func EncryptFileFolder(d *structure.Documents) {
 
             	if d.Doc[i][len(d.Doc[i])-4:]!=".gsh"{
             		// Chiffrement du fichier. 
-                	/*errFile := EncryptFileAES(d.Doc[i],d)
-                	if errFile != nil {
-                    	fmt.Println(errFile)
-                	}*/
                 	go EncryptFileAES(d.Doc[i], d, channel, wg)
             	}
             }

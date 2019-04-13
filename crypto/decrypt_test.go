@@ -86,5 +86,5 @@ func TestEncryptDecryptFile(t * testing.T){
     }
 
     os.Remove("../env/test6.md")
-    //os.Remove("../env/test6.md.gsh")
+    os.Remove("../env/test6.md.gsh")
 }
