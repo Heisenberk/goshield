@@ -3,6 +3,7 @@ package command
 
 import "fmt"
 import "errors"
+import "time"
 
 import "github.com/Heisenberk/goshield/structure"
 import "github.com/Heisenberk/goshield/crypto"
@@ -61,24 +62,30 @@ func Interpret(d  *structure.Documents, err error) {
     if (err==nil){
         // réalisation d'un chiffrement. 
         if(d.Mode == structure.ENCRYPT){
+        	startEncrypt := time.Now()
             crypto.EncryptFileFolder(d)
+            elapsed := time.Since(startEncrypt)
+            fmt.Printf("-> Temps ecoule pour le chiffrement : \033[36m%s\n\033[0m ", elapsed)
         }
 
         // réalisation d'un déchiffrement. 
         if(d.Mode == structure.DECRYPT){
+        	startDecrypt := time.Now()
             crypto.DecryptFileFolder(d)
+            elapsed := time.Since(startDecrypt)
+            fmt.Printf("-> Temps ecoule pour le dechiffrement : \033[36m%s\n\033[0m ", elapsed)
         } 
 
     // si l'utilisateur ne tape aucun argument, on affiche les commandes. 
     }else if(err.Error()=="Aucun argument. "){
 
-        fmt.Println("");
+        fmt.Println("\033[36m");
         fmt.Println("Commande de GoShield : ")
         fmt.Println("");
         fmt.Println("-e/--encrypt : permet de choisir de chiffrer ")
         fmt.Println("-d/--decrypt : permet de choisir de  déchiffrer")
         fmt.Println("-p[password] : permet de taper le mot de passe " )
-        fmt.Println("- [liste des fichiers/dossiers] : liste les fichiers/dossiers à chiffrer/déchiffrer")
+        fmt.Println("- [liste des fichiers/dossiers] : liste les fichiers/dossiers à chiffrer/déchiffrer\033[0m")
 
     // si le chiffrement/déchiffrement rencontre un problème. 
     }else {
