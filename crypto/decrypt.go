@@ -256,11 +256,13 @@ func DecryptFileFolder(d *structure.Documents) {
             // si l'objet spécifié par le chemin est un fichier.
             }else if mode.IsRegular()== true {
 
-            	// Déchiffrement du fichier. 
-                errFile := DecryptFileAES(d.Doc[i],d)
-                if errFile != nil {
-                    fmt.Println(errFile)
-                }
+            	if d.Doc[i][len(d.Doc[i])-4:]==".gsh"{
+            		// Déchiffrement du fichier. 
+                	errFile := DecryptFileAES(d.Doc[i],d)
+                	if errFile != nil {
+                   		fmt.Println(errFile)
+                	}
+            	}
             }
         }
     }

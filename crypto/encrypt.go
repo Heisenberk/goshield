@@ -205,10 +205,13 @@ func EncryptFolder (path string, d *structure.Documents) {
 
                 // Si l'objet spécifié par le chemin est un fichier.
                 }else if mode.IsRegular()== true {
-                    errFile := EncryptFileAES(newPath,d)
-                    if errFile != nil {
-                        fmt.Println(errFile)
-                    }
+                	// si l'extension du fichier est différent de .gsh on peut chiffrer le fichier.
+                	if newPath[len(newPath)-4:]!=".gsh"{
+                		errFile := EncryptFileAES(newPath,d)
+                    	if errFile != nil {
+                        	fmt.Println(errFile)
+                    	}
+                	} 
                 }
             }
         }
@@ -248,11 +251,13 @@ func EncryptFileFolder(d *structure.Documents) {
             // Si l'objet spécifié par le chemin est un fichier.
             }else if mode.IsRegular()== true {
 
-            	// Chiffrement du fichier. 
-                errFile := EncryptFileAES(d.Doc[i],d)
-                if errFile != nil {
-                    fmt.Println(errFile)
-                }
+            	if d.Doc[i][len(d.Doc[i])-4:]!=".gsh"{
+            		// Chiffrement du fichier. 
+                	errFile := EncryptFileAES(d.Doc[i],d)
+                	if errFile != nil {
+                    	fmt.Println(errFile)
+                	}
+            	}
             }
         }
     }
