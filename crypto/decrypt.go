@@ -20,13 +20,13 @@ func DecryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error){
 
 	// Si la taille de l'entrée est invalide on lance une erreur. 
 	if len(input)%aes.BlockSize != 0 {
-		return output, errors.New("\033[31mFailure Decryption\033[0m : Taille du bloc invalide.")
+		return output, errors.New("- \033[31mFailure Decryption\033[0m : Taille du bloc invalide.")
 	}
 
 	// Preparation du bloc qui sera chiffré.
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return output, errors.New("\033[31mFailure Decryption\033[0m : Erreur lors du déchiffrement d'un bloc.")
+		return output, errors.New("- \033[31mFailure Decryption\033[0m : Erreur lors du déchiffrement d'un bloc.")
 	}
 
 	// Chiffrement AES avec le mode opératoire CBC.
@@ -45,14 +45,14 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	// ouverture du fichier à déchiffrer
 	inputFile, err1 := os.Open(pathFile) 
 	if err1 != nil {
-		var texteError string = "\033[31mFailure Decryption\033[0m : Impossible d'ouvrir le fichier à déchiffrer "+pathFile+". "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible d'ouvrir le fichier à déchiffrer "+pathFile+". "
 		channel <- errors.New(texteError)
 		return 
 	}
 
 	// renvoie une erreur si l'extension n'est pas la bonne
 	if pathFile[(len(pathFile)-4):]!= ".gsh"{
-		var texteError string = "\033[31mFailure Decryption\033[0m : L'extension de "+pathFile+" est invalide (doit être \".gsh\"). "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : L'extension de "+pathFile+" est invalide (doit être \".gsh\"). "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -61,7 +61,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	signature := make([]byte, 8)
     _, err2 := inputFile.Read(signature)
     if err2 != nil {
-		var texteError string = "\033[31mFailure Decryption\033[0m : Format du fichier à déchiffrer "+pathFile+" invalide. "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : Format du fichier à déchiffrer "+pathFile+" invalide. "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -70,7 +70,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
     salt := make([]byte, 15)
     _, err22 := inputFile.Read(salt)
     if err22 != nil {
-		var texteError string = "\033[31mFailure Decryption\033[0m : Impossible de lire le salt du fichier chiffré "+pathFile+". "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible de lire le salt du fichier chiffré "+pathFile+". "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -81,7 +81,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	IV := make([]byte, 16)
 	_, err23 := inputFile.Read(IV)
     if err23 != nil {
-		var texteError string = "\033[31mFailure Decryption\033[0m : Impossible de lire la valeur d'initialisation du fichier chiffré "+pathFile+". "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible de lire la valeur d'initialisation du fichier chiffré "+pathFile+". "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -90,14 +90,14 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	lengthTab := make([]byte, 1)
 	_, err24 := inputFile.Read(lengthTab)
     if err24 != nil {
-		var texteError string = "\033[31mFailure Decryption\033[0m : Impossible de lire la taille du dernier bloc du fichier chiffré "+pathFile+". "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible de lire la taille du dernier bloc du fichier chiffré "+pathFile+". "
 		channel <- errors.New(texteError)
 		return
 	}
 
 	stat, err2 := inputFile.Stat()
 	if err2 != nil {
-  		var texteError string = "\033[31mFailure Decryption\033[0m : Impossible d'interpréter le fichier à déchiffrer "+pathFile+". "
+  		var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible d'interpréter le fichier à déchiffrer "+pathFile+". "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -106,7 +106,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	var division int = (int)((stat.Size()-8-15-16-1)/aes.BlockSize) 
 	var iterations int = division
 	if (int)(stat.Size()-8-15-16-1)%aes.BlockSize != 0 {
-		var texteError string = "\033[31mFailure Decryption\033[0m : Fichier" + pathFile +" non conforme pour le déchiffrement AES. "
+		var texteError string = "- \033[31mFailure Decryption\033[0m : Fichier" + pathFile +" non conforme pour le déchiffrement AES. "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -115,7 +115,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
     var nameOutput string=pathFile[:(len(pathFile)-4)]
     outputFile, err3 := os.Create(nameOutput)
     if err3 != nil {
-  		var texteError string = "\033[31mFailure Decryption\033[0m : Impossible d'écrire le fichier chiffré "+nameOutput+". "
+  		var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible d'écrire le fichier chiffré "+nameOutput+". "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -136,7 +136,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 		// lecture de chaque bloc de 16 octets
 		_, err8 := inputFile.Read(input)
 		if err8 != nil {
-  			var texteError string = "\033[31mFailure Decryption\033[0m : Impossible de lire dans le fichier à déchiffrer "+pathFile+". "
+  			var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible de lire dans le fichier à déchiffrer "+pathFile+". "
 			channel <- errors.New(texteError)
 			return
 		}
@@ -148,7 +148,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 		var err10 error
 		cipherBlock, err10 = DecryptBlocAES(IV, doc.Hash, input)
 		if err10 != nil {
-			var texteError string = "\033[31mFailure Decryption\033[0m : Impossible de déchiffrer le fichier "+pathFile+". "
+			var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible de déchiffrer le fichier "+pathFile+". "
 			channel <- errors.New(texteError)
 			return
 		}
@@ -158,14 +158,14 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 			if lengthTab[0]!= 0 {
 				_, err11 := outputFile.Write(cipherBlock[:lengthTab[0]])
 				if err11 != nil {
-  					var texteError string = "\033[31mFailure Decryption\033[0m : Impossible d'écrire dans le fichier "+nameOutput+". "
+  					var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible d'écrire dans le fichier "+nameOutput+". "
 					channel <- errors.New(texteError)
 					return
 				}
 			}else {
 				_, err12 := outputFile.Write(cipherBlock)
 				if err12 != nil {
-  					var texteError string = "\033[31mFailure Decryption\033[0m : Impossible d'écrire dans le fichier "+nameOutput+". "
+  					var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible d'écrire dans le fichier "+nameOutput+". "
 					channel <- errors.New(texteError)
 					return
 				}
@@ -175,7 +175,7 @@ func DecryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 		}else {
 			_, err13 := outputFile.Write(cipherBlock)
 			if err13 != nil {
-  				var texteError string = "\033[31mFailure Decryption\033[0m : Impossible d'écrire dans le fichier "+nameOutput+". "
+  				var texteError string = "- \033[31mFailure Decryption\033[0m : Impossible d'écrire dans le fichier "+nameOutput+". "
 				channel <- errors.New(texteError)
 				return
 			}

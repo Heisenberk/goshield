@@ -30,13 +30,13 @@ func EncryptBlocAES(iv []byte, key []byte, input []byte) ([]byte, error) {
 
 	// Si la taille de l'entrée est invalide on lance une erreur. 
 	if len(input)%aes.BlockSize != 0 {
-		return output, errors.New("\033[31mFailure Encryption\033[0m : Taille du bloc invalide.")
+		return output, errors.New("- \033[31mFailure Encryption\033[0m : Taille du bloc invalide.")
 	}
 
 	// Preparation du bloc qui sera chiffré. 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return output, errors.New("\033[31mFailure Encryption\033[0m : Erreur lors du chiffrement d'un bloc.")
+		return output, errors.New("- \033[31mFailure Encryption\033[0m : Erreur lors du chiffrement d'un bloc.")
 	}
 
 	// Chiffrement AES avec le mode opératoire CBC.
@@ -55,20 +55,20 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	// ouverture du fichier a chiffrer
 	inputFile, err1 := os.Open(pathFile) 
 	if err1 != nil {
-		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'ouvrir le fichier à chiffrer "+pathFile+". "
+		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'ouvrir le fichier à chiffrer "+pathFile+". "
 		channel <- errors.New(texteError)
 		return
 	}
 	stat, err2 := inputFile.Stat()
 	if err2 != nil {
-  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'interpréter le fichier à chiffrer "+pathFile+". "
+  		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'interpréter le fichier à chiffrer "+pathFile+". "
 		channel <- errors.New(texteError)
 		return 
 	}
 
 	// vérification de la bonne permission
 	if stat.Mode().String()[1]=='-' {
-		var texteError string = "\033[31mFailure Encryption\033[0m : Permission du fichier à chiffrer "+pathFile+" incorrecte . "
+		var texteError string = "- \033[31mFailure Encryption\033[0m : Permission du fichier à chiffrer "+pathFile+" incorrecte . "
 		channel <- errors.New(texteError)
 		return 
 	}
@@ -82,7 +82,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	// ouverture du fichier résultat
     outputFile, err3 := os.Create(pathFile+".gsh")
     if err3 != nil {
-  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire le fichier chiffré "+pathFile+".gsh. "
+  		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'écrire le fichier chiffré "+pathFile+".gsh. "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -90,7 +90,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	// ecriture de la signature
 	_, err4 := outputFile.WriteString("GOSHIELD")
     if err4 != nil {
-  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire dans le fichier chiffré "+pathFile+".gsh. "
+  		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'écrire dans le fichier chiffré "+pathFile+".gsh. "
 		channel <- errors.New(texteError) 
 		return
 	}
@@ -99,7 +99,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	CreateHash(doc)
 	_, err5 := outputFile.Write(doc.Salt)
 	if err5 != nil {
-  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible de générer le salt. "
+  		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible de générer le salt. "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -108,7 +108,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	IV := CreateIV()
 	_, err6 := outputFile.Write(IV)
     if err6 != nil {
-  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire la valeur d'initialisation IV. "
+  		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'écrire la valeur d'initialisation IV. "
 		channel <- errors.New(texteError) 
 		return
 	}
@@ -124,7 +124,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 	lengthWritten[0]=byte(length)
 	_, err7 := outputFile.Write(lengthWritten)
 	if err7 != nil {
-  		var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire la taille du dernier bloc chiffré. "
+  		var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'écrire la taille du dernier bloc chiffré. "
 		channel <- errors.New(texteError)
 		return
 	}
@@ -140,7 +140,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 		// lecture de chaque bloc de 16 octets
 		_, err8 := inputFile.Read(input)
 		if err8 != nil {
-  			var texteError string = "\033[31mFailure Encryption\033[0m : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
+  			var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible de lire dans le fichier à chiffrer "+pathFile+". "
 			channel <- errors.New(texteError)
 			return
 		}
@@ -154,7 +154,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 		var err10 error
 		cipherBlock, err10 = EncryptBlocAES(IV, doc.Hash, input)
 		if err10 != nil {
-			var texteError string = "\033[31mFailure Encryption\033[0m : Impossible de chiffrer le fichier "+pathFile+". "
+			var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible de chiffrer le fichier "+pathFile+". "
 			channel <- errors.New(texteError)
 			return
 		}
@@ -162,7 +162,7 @@ func EncryptFileAES(pathFile string, doc *structure.Documents, channel chan erro
 		// écriture du bloc chiffré
 		_, err11 := outputFile.Write(cipherBlock)
 		if err11 != nil {
-  			var texteError string = "\033[31mFailure Encryption\033[0m : Impossible d'écrire dans le fichier "+pathFile+".gsh. "
+  			var texteError string = "- \033[31mFailure Encryption\033[0m : Impossible d'écrire dans le fichier "+pathFile+".gsh. "
 			channel <- errors.New(texteError)
 			return
 		}
