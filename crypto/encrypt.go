@@ -325,7 +325,9 @@ func EncryptFileFolder(d *structure.Documents) {
         if valid == true {
         	mode := stat.Mode()
         	if mode.IsRegular() == true {
-				countFiles=countFiles+1
+                if d.Doc[j][len(d.Doc[j])-4:]!=".gsh"{
+                    countFiles=countFiles+1
+                }
 			}
         }
 	}
@@ -382,10 +384,12 @@ func EncryptFileFolder(d *structure.Documents) {
         if valid == true {
         	mode := stat2.Mode()
         	if mode.IsRegular() == true {
-				err := <- channel 
-				if err != nil {
-					fmt.Println(err)
-				}
+                if d.Doc[j][len(d.Doc[j])-4:]!=".gsh"{
+                    err := <- channel 
+                    if err != nil {
+                        fmt.Println(err)
+                    }
+                }
 			}	
         }
 	}

@@ -80,7 +80,7 @@ func Interpret(d  *structure.Documents, err error) {
     }else if(err.Error()=="Aucun argument. "){
 
         fmt.Println("\033[36m");
-        fmt.Println("Commande de GoShield : ")
+        fmt.Println("Commande de GoShield 2.0 : ")
         fmt.Println("");
         fmt.Println("-e/--encrypt : permet de choisir de chiffrer ")
         fmt.Println("-d/--decrypt : permet de choisir de  déchiffrer")
