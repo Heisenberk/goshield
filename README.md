@@ -28,6 +28,7 @@
 			2. [Déchiffrement de fichiers/dossiers](#decrypt_file_folder)
 				1. [Déchiffrement sans goroutine](#decrypt_sans_goroutine)
 				2. [déchiffrement avec goroutines](#decrypt_avec_goroutine)
+	2. [Comparaison de l'application avec et sans l'utilisation de goroutines](#comparaison)
 
 
 ## Manuel de l'utilisateur <a id="utilisateur"></a> 
@@ -1589,3 +1590,23 @@ func DecryptFileFolder(d *structure.Documents) {
 
 }
 ```
+
+### Comparaison de l'application avec et sans l'utilisation de goroutines <a id="comparaison"></a> 
+
+Il peut être intéressant de comparer les temps d'exécution d'un chiffrement d'un dossier contenant plusieurs autres dossiers ainsi que des fichiers avec ou sans goroutine. 
+
+Pour que notre temps soit le plus représentatif possible, il faut réaliser plusieurs fois la même exécution : 
+
+- Sans l'utilisation de goroutine (avec la version `goshield v1.1` dans cet exemple), nous avons trouvé : 
+
+<img src="report/pictures/temps_sans_goroutine.PNG" alt="Temps sans goroutine"/>
+
+Ce qui revient à 0.22 seconde pour 1 exécution de cet exemple-ci. 
+
+- Avec l'utilisation de goroutines (avec la version `goshield v2.1` dans cet exemple), nous avons trouvé : 
+
+<img src="report/pictures/temps_avec_goroutine.PNG" alt="Temps avec goroutine"/>
+
+Ce qui revient à 0.17 seconde pour 1 exécution de cet exemple-ci. 
+
+On remarque une certaine différence, mais ce n'est pas conséquent sachant que le chiffrement/déchiffrement d'un unique fichier est très rapide. En effet, la rapidité du chiffrement symétrique est son point fort. 
