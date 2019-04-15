@@ -9,7 +9,7 @@ import "github.com/Heisenberk/goshield/structure"
 import "github.com/Heisenberk/goshield/crypto"
 
 
-// Parse représente la fonction qui interpréte les commandes de l'utilisateur. 
+// Parse représente la fonction qui interpréte les commandes de l'utilisateur et initialiser Documents. 
 func Parse(arg []string) (*structure.Documents, error) {
 
 	// si l'utilisateur ne met pas d'arguments.
