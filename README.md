@@ -118,7 +118,7 @@ Le contenu de ce chiffrement sera écrit dans un fichier avec le nom du clair in
 
 ### Fonctionnement du déchiffrement <a id="fonction_dechiffr"></a> 
 
-Le chiffrement d'un fichier consiste en plusieurs étapes : 
+Le déchiffrement d'un fichier consiste en plusieurs étapes : 
 - vérification de la bonne extension `.gsh`.
 - vérification de la signature `GOSHIELD` censée apparaître sur les 8 premiers octets. 
 - lecture du sel cryptographique et calcul de la clé en concaténant le sel avec le mot de passe choisi par l'utilisateur lors du déchiffrement. Cette concaténation sera hachée en utilisant SHA-256, ce qui produira la clé. Si l'utilisateur choisit le même mot de passe qu'au chiffrement, les données déchiffrées seront correctes. 
