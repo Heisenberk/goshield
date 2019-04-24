@@ -124,7 +124,6 @@ Le déchiffrement d'un fichier consiste en plusieurs étapes :
 - lecture du sel cryptographique et calcul de la clé en concaténant le sel avec le mot de passe choisi par l'utilisateur lors du déchiffrement. Cette concaténation sera hachée en utilisant SHA-256, ce qui produira la clé. Si l'utilisateur choisit le même mot de passe qu'au chiffrement, les données déchiffrées seront correctes. 
 - lecture de la valeur du vecteur d'initialisation (IV).
 - lecture de la taille du dernier bloc en octets. Cela permettra d'enlever le padding sur le dernier bloc. 
-- écriture de chaque bloc chiffré en utilisant AES-256 avec CBC.
 - déchiffrement et écriture de chaque bloc déchiffré en utilisant AES-256 avec CBC. 
 Le contenu de ce chiffrement sera écrit dans un fichier dont on aura enlevé l'extension goshield (`.gsh`) du fichier à déchiffrer.
 
